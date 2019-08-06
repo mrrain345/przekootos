@@ -1,24 +1,17 @@
 const express = require('express');
 const { Client } = require('pg');
+const dbConfig = require('./postgres.config');
 
 const server = express();
+server.use(express.json());
+
 const port = process.env.PORT || 3000;
+const db = new Client(dbConfig);
+db.connect();
 
-const client = new Client({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'postgres',
-  password: 'qwerty',
-  port: 5432,
-});
+server.get('/', (req, res) => res.send('Hello world!'));
 
-server.get('/', async (req, res) => {
-  await client.connect();
-  const db = await client.query('SELECT * FROM users');
-  const output = db.rows[0];
-  await client.end();
-  res.json(output);
-});
+require('./api/user')(server, db);
 
 server.listen(port, () => {
   console.log(`listening on ${port}`);
