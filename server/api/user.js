@@ -3,19 +3,19 @@ const hash = require('password-hash');
 
 module.exports = (server, db) => {
   // get all users
-  server.get('/user/', async (req, res) => {
+  server.get('/api/user/', async (req, res) => {
     const query = await db.query('SELECT * FROM users');
     res.json(query.rows);
   });
   
   // get user
-  server.get('/user/:id', async (req, res) => {
+  server.get('/api/user/:id', async (req, res) => {
     const query = await db.query('SELECT * FROM users WHERE id=$1', [req.params.id]);
     res.json(query.rows[0]);
   });
 
   // add new user
-  server.post('/user', async (req, res) => {
+  server.post('/api/user', async (req, res) => {
     // { username, password, confirm_password, email }
     if (!req.body.username) {
       res.json({ code: 1, message: 'Username is required' });
