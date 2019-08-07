@@ -11,7 +11,8 @@ db.connect();
 
 server.get('/', (req, res) => res.send('Hello world!'));
 
-require('./api/user')(server, db);
+// REST API
+require('./api/users')(server, db);
 
 server.listen(port, () => {
   console.log(`listening on ${port}`);

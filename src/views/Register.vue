@@ -89,7 +89,7 @@ export default {
   }),
   methods: {
     create() {
-      fetch('/api/user', {
+      fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

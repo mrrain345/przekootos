@@ -3,19 +3,19 @@ const hash = require('password-hash');
 
 module.exports = (server, db) => {
   // get all users
-  server.get('/api/user/', async (req, res) => {
+  server.get('/api/users/', async (req, res) => {
     const query = await db.query('SELECT * FROM users');
     res.json(query.rows);
   });
 
   // get user
-  server.get('/api/user/:id', async (req, res) => {
+  server.get('/api/users/:id', async (req, res) => {
     const query = await db.query('SELECT * FROM users WHERE id=$1', [req.params.id]);
     res.json(query.rows[0]);
   });
 
   // add new user
-  server.post('/api/user', async (req, res) => {
+  server.post('/api/users', async (req, res) => {
     // { fname, lname, password, cpassword, email }
     let errors = [];
 
@@ -48,7 +48,7 @@ module.exports = (server, db) => {
     const email = await db.query(
       'SELECT id FROM users WHERE email=$1 LIMIT 1',
       [req.body.email],
-    );
+    ).catch(err => console.error(err));
 
     if (email.rows.length !== 0) {
       errors.push({ code: 8, target: 'email', message: 'Email is used' });
@@ -60,7 +60,7 @@ module.exports = (server, db) => {
       await db.query(
         'INSERT INTO users (username, password, email) VALUES ($1, $2, $3)',
         [req.body.fname + ' ' + req.body.lname, hash.generate(req.body.password), req.body.email],
-      );
+      ).catch(err => console.error(err));
     }
 
     res.json({
