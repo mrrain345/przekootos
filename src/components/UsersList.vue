@@ -22,7 +22,7 @@ export default {
   mounted() {
     fetch('/api/user')
       .then(res => res.json())
-      .then(res => this.users = res);
+      .then((res) => { this.users = res; });
   },
 };
 </script>
@@ -35,10 +35,15 @@ table {
 
 thead {
   text-align: center;
+  background-color: #2196f3;
+  color: #e3f2fd;
+}
+
+th {
+  padding: 5px 7px;
 }
 
 td {
-  padding: 2px 5px;
+  padding: 2px 7px;
 }
 </style>
-
