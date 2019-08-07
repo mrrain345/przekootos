@@ -1,7 +1,7 @@
 const validator = require('validator');
 const hash = require('password-hash');
 
-module.exports = (server, db) => {
+module.exports = (server, db, helper) => {
   // get all users
   server.get('/api/users/', async (req, res) => {
     const query = await db.query('SELECT * FROM users');
