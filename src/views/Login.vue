@@ -59,12 +59,19 @@ export default {
           password: this.password,
         }),
       })
-        .then(res => res.json())
-        .then((res) => {
-          console.log(res);
-          this.alert = !res.ok;
-        });
+      .then(res => res.json())
+      .then((res) => {
+        console.log(res);
+        this.alert = !res.ok;
+      });
     },
+  },
+  created() {
+    fetch('/api/session')
+    .then(res => res.json())
+    .then((res) => {
+      console.log('Session:', res.ok);
+    });
   },
 };
 </script>
