@@ -62,17 +62,21 @@ module.exports = (server, db, helper) => {
     }
 
     const ok = errors.length === 0;
+    let user = undefined;
 
     if (ok) {
-      await db.query(
-        'INSERT INTO users (username, password, email) VALUES ($1, $2, $3)',
+      const query = await db.query(
+        'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id',
         [req.body.fname + ' ' + req.body.lname, hash.generate(req.body.password), req.body.email],
       ).catch(err => console.error(err));
+
+      user = await helper.create_session(res, query.rows[0].id);
     }
 
     res.json({
       ok: ok,
       errors: errors,
+      user: user,
     });
   });
 };
