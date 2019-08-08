@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import LoginPanel from '@/components/LoginPanel'
-import Banner from '@/components/Banner'
+import LoginPanel from '@/components/LoginPanel.vue';
+import Banner from '@/components/Banner.vue';
 
 export default {
   name: 'login',
@@ -23,11 +23,11 @@ export default {
   }),
   beforeCreate() {
     fetch('/api/session')
-    .then(res => res.json())
-    .then((res) => {
-      if (res.ok) this.$router.push({ path: "/" });
-      else this.show = !res.ok;
-    });
+      .then(res => res.json())
+      .then((res) => {
+        if (res.ok) this.$router.push({ path: '/' });
+        else this.show = !res.ok;
+      });
   },
 };
 </script>

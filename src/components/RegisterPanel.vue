@@ -76,7 +76,6 @@ export default {
       password: '',
       cpassword: '',
     },
-    show: false,
   }),
   methods: {
     create() {
@@ -89,7 +88,7 @@ export default {
       })
         .then(res => res.json())
         .then((res) => {
-          if (res.ok) this.$router.push({ path: "/" });
+          if (res.ok) this.$router.push({ path: '/' });
           else this.setAlerts(res);
         });
     },
@@ -105,15 +104,7 @@ export default {
       res.errors.forEach((alert) => {
         this.alerts[alert.target] = alert.message;
       });
-    }
-  },
-  beforeCreate() {
-    fetch('/api/session')
-    .then(res => res.json())
-    .then((res) => {
-      if (res.ok) this.$router.push({ path: "/" });
-      else this.show = !res.ok;
-    });
+    },
   },
 };
 </script>

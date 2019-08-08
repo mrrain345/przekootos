@@ -8,8 +8,8 @@
 <script>
 export default {
   name: 'Banner',
-  props: [ 'msg' ]
-}
+  props: ['msg'],
+};
 </script>
 
 <style scoped>

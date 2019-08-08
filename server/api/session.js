@@ -5,7 +5,7 @@ module.exports = (server, db, helper) => {
   server.get('/api/session', async (req, res) => {
     const user = await helper.get_user(req);
     if (user === null) return res.json({ ok: false });
-    else return res.json({ ok: true, user: user });
+    return res.json({ ok: true, user });
   });
 
   // create new session
@@ -16,18 +16,18 @@ module.exports = (server, db, helper) => {
 
     const query = await db.query(
       'SELECT id, password FROM users WHERE email=$1 LIMIT 1',
-      [req.body.email]
+      [req.body.email],
     ).catch(err => console.error(err));
 
     if (query.rows.length !== 1) return res.json({ ok: false });
     if (!hash.verify(req.body.password, query.rows[0].password)) return res.json({ ok: false });
-    
-    const id = query.rows[0].id;
+
+    const { id } = query.rows[0];
     const user = await helper.create_session(res, id);
-    
+
     return res.json({
       ok: true,
-      user: user,
+      user,
     });
   });
 
@@ -35,14 +35,14 @@ module.exports = (server, db, helper) => {
   server.delete('/api/session', async (req, res) => {
     const session = helper.get_session(req);
     if (!session) return res.json({ ok: false });
-    
+
     await db.query(
       'DELETE FROM sessions WHERE "session"=$1',
-      [session]
+      [session],
     ).catch(err => console.error(err));
 
     res.clearCookie('session');
-    
+
     return res.json({ ok: true });
   });
 };

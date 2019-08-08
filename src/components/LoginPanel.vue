@@ -36,7 +36,6 @@ export default {
     email: '',
     password: '',
     alert: false,
-    show: false,
   }),
   methods: {
     login() {
@@ -50,21 +49,13 @@ export default {
           password: this.password,
         }),
       })
-      .then(res => res.json())
-      .then((res) => {
-        this.alert = !res.ok;
-        console.log(res);
-        if (res.ok) this.$router.push({ path: "/" });
-      });
+        .then(res => res.json())
+        .then((res) => {
+          this.alert = !res.ok;
+          console.log(res);
+          if (res.ok) this.$router.push({ path: '/' });
+        });
     },
-  },
-  beforeCreate() {
-    fetch('/api/session')
-    .then(res => res.json())
-    .then((res) => {
-      if (res.ok) this.$router.push({ path: "/" });
-      else this.show = !res.ok;
-    });
   },
 };
 </script>

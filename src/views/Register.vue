@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import RegisterPanel from '@/components/RegisterPanel'
-import Banner from '@/components/Banner'
+import RegisterPanel from '@/components/RegisterPanel.vue';
+import Banner from '@/components/Banner.vue';
 
 export default {
   name: 'register',
@@ -23,11 +23,11 @@ export default {
   }),
   beforeCreate() {
     fetch('/api/session')
-    .then(res => res.json())
-    .then((res) => {
-      if (res.ok) this.$router.push({ path: "/" });
-      else this.show = !res.ok;
-    });
+      .then(res => res.json())
+      .then((res) => {
+        if (res.ok) this.$router.push({ path: '/' });
+        else this.show = !res.ok;
+      });
   },
 };
 </script>
