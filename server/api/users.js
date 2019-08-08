@@ -4,13 +4,20 @@ const hash = require('password-hash');
 module.exports = (server, db, helper) => {
   // get all users
   server.get('/api/users/', async (req, res) => {
-    const query = await db.query('SELECT * FROM users');
+    let query = await db.query('SELECT * FROM users');
+    query.rows.forEach(user => {
+      user.password = undefined;
+    });
     res.json(query.rows);
   });
 
   // get user
   server.get('/api/users/:id', async (req, res) => {
-    const query = await db.query('SELECT * FROM users WHERE id=$1', [req.params.id]);
+    if (!Number.isInteger(req.params.id)) return res.status(404);
+    let query = await db.query('SELECT * FROM users WHERE id=$1', [req.params.id]);
+    query.rows.forEach(user => {
+      user.password = undefined;
+    });
     res.json(query.rows[0]);
   });
 

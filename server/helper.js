@@ -1,5 +1,6 @@
-module.exports = (db) => ({
-  get_settion: async (req, session) => {
+module.exports = (db, cookies) => ({
+  cookies: cookies,
+  get_settion: async (req) => {
     const session = req.signedCookies['session'];
     if (!session || session.length !== 32) return null;
     const query = await db.query(
@@ -9,5 +10,5 @@ module.exports = (db) => ({
     if (query.rows.length !== 1) return null;
     const user = query.rows[0];
     return({ id: user.id, username: user.username, session: session });
-  }
-})
+  },
+});

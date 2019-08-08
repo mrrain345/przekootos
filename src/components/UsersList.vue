@@ -20,7 +20,7 @@ export default {
     users: [],
   }),
   mounted() {
-    fetch('/api/user')
+    fetch('/api/users')
       .then(res => res.json())
       .then((res) => { this.users = res; });
   },
