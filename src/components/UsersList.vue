@@ -1,21 +1,19 @@
 <template>
-  <table>
-    <thead>
-      <th>No.</th>
-      <th>User</th>
-      <th>Email</th>
-    </thead>
-    <tr v-for="(user, id) in users" :key="id">
-      <td>{{ id+1 }}</td>
-      <td>{{ user.username }}</td>
-      <td>{{ user.email }}</td>
-    </tr>
-  </table>
+  <div class="container">
+    <div v-for="(user, id) in users" :key="id">
+      <UserItem :id="id" :user="user"/>
+    </div>
+  </div>
 </template>
 
 <script>
+import UserItem from '@/components/UserItem.vue';
+
 export default {
   name: 'UsersList',
+  components: {
+    UserItem,
+  },
   data: () => ({
     users: [],
   }),
@@ -26,24 +24,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-table {
-  margin: 0 auto;
-  text-align: left;
-}
-
-thead {
-  text-align: center;
-  background-color: #2196f3;
-  color: #e3f2fd;
-}
-
-th {
-  padding: 5px 7px;
-}
-
-td {
-  padding: 2px 7px;
-}
-</style>

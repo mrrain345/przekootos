@@ -114,6 +114,7 @@ export default {
   background-color: #2196f3;
   border-radius: 5px;
   padding: 40px 20px;
+  box-shadow: #0277bd 2px 2px 4px 1px;
 }
 
 label {
