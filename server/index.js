@@ -13,9 +13,14 @@ db.connect();
 
 const helper = require('./helper')(db, cookies);
 
+const api = express.Router();
+
 // REST API
-require('./api/users')(server, db, helper);
-require('./api/session')(server, db, helper);
+require('./api/session')(api, db, helper);
+require('./api/users')(api, db, helper);
+require('./api/users.likes')(api, db, helper);
+
+server.use('/api', api);
 
 server.listen(port, () => {
   console.log(`listening on ${port}`);

@@ -7,6 +7,20 @@ module.exports = (db, cookies) => ({
     if (!session || session.length !== 32) return null;
     return session;
   },
+
+  get_userid: async (req) => {
+    const { session } = req.signedCookies;
+    if (!session || session.length !== 32) return null;
+
+    const query = await db.query(
+      'SELECT "user" FROM sessions WHERE "session"=$1 LIMIT 1',
+      [session],
+    ).catch(err => console.error(err));
+
+    if (query.rows.length !== 1) return null;
+    return query.rows[0].user;
+  },
+
   get_user: async (req) => {
     const { session } = req.signedCookies;
     if (!session || session.length !== 32) return null;
@@ -21,6 +35,7 @@ module.exports = (db, cookies) => ({
     user.password = undefined;
     return { id: user.id, userdata: user, session };
   },
+
   create_session: async (res, id) => {
     const query = await db.query(
       'SELECT * FROM users WHERE id=$1 LIMIT 1',

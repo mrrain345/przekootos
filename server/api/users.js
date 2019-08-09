@@ -1,9 +1,9 @@
 const validator = require('validator');
 const hash = require('password-hash');
 
-module.exports = (server, db, helper) => {
+module.exports = (api, db, helper) => {
   // get all users
-  server.get('/api/users/', async (req, res) => {
+  api.get('/users/', async (req, res) => {
     const query = await db.query('SELECT * FROM users');
     for (let i = 0; i < query.rows.length; i += 1) {
       query.rows[i].password = undefined;
@@ -12,16 +12,16 @@ module.exports = (server, db, helper) => {
   });
 
   // get user
-  server.get('/api/users/:id', async (req, res) => {
-    if (!Number.isInteger(req.params.id)) return res.status(404);
+  api.get('/users/:id', async (req, res) => {
+    if (!req.params.id) return res.sendStatus(404);
     const query = await db.query('SELECT * FROM users WHERE id=$1 LIMIT 1', [req.params.id]);
-    if (query.rows.length !== 1) return res.status(404);
+    if (query.rows.length !== 1) return res.sendStatus(404);
     query.rows[0].password = undefined;
     return res.json(query.rows[0]);
   });
 
   // add new user
-  server.post('/api/users', async (req, res) => {
+  api.post('/users', async (req, res) => {
     // { fname, lname, password, cpassword, email }
     const errors = [];
 
