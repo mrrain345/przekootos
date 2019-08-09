@@ -5,7 +5,9 @@
       <div id="email">{{user.email}}</div>
     </div>
     <div id="right" v-if="display(user)">
-      <img id="przekootos" class="noselect" :class="{ active: active }" @click="click" src="/przekootos.png"/>
+      <img id="przekootos" class="noselect" src="/przekootos.png"
+        :class="{ active: active }" @click="click"
+      />
     </div>
     <div style="clear:both;"></div>
   </div>
@@ -23,17 +25,17 @@ export default {
     click() {
       this.active = !this.active;
 
-      fetch('/api/users/'+this.user.id+'/like', {
+      fetch(`/api/users/${this.user.id}/like`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ like: this.active }),
       })
-      .then(res => res.json())
-      .then((res) => {
-        this.active = res.like;
-      });
+        .then(res => res.json())
+        .then((res) => {
+          this.active = res.like;
+        });
     },
     display(user) {
       return this.loaded && this.me !== null && user.id !== this.me;
@@ -41,13 +43,13 @@ export default {
   },
   beforeMount() {
     if (!this.me) return;
-    fetch('/api/users/'+this.user.id+'/like')
-    .then(res => res.json())
-    .then((res) => {
-      this.active = res.like;
-      this.loaded = true;
-    });
-  }
+    fetch(`/api/users/${this.user.id}/like`)
+      .then(res => res.json())
+      .then((res) => {
+        this.active = res.like;
+        this.loaded = true;
+      });
+  },
 };
 </script>
 

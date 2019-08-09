@@ -86,14 +86,13 @@ export default {
         },
         body: JSON.stringify(this.form),
       })
-      .then(res => res.json())
-      .then((res) => {
-        if (res.ok) {
-          this.$root.$emit('login', true);
-          this.$router.push({ path: '/' });
-        }
-        else this.setAlerts(res);
-      });
+        .then(res => res.json())
+        .then((res) => {
+          if (res.ok) {
+            this.$root.$emit('login', true);
+            this.$router.push({ path: '/' });
+          } else this.setAlerts(res);
+        });
     },
     setAlerts(res) {
       this.alerts = {

@@ -20,15 +20,15 @@ export default {
   }),
   beforeMount() {
     fetch('/api/session')
-    .then(res => res.json())
-    .then(res => { 
-      if (res.ok) this.me = res.user.id;
-      else this.me = null;
-    });
+      .then(res => res.json())
+      .then((res) => {
+        if (res.ok) this.me = res.user.id;
+        else this.me = null;
+      });
 
     fetch('/api/users')
-    .then(res => res.json())
-    .then((res) => { this.users = res; });
+      .then(res => res.json())
+      .then((res) => { this.users = res; });
   },
 };
 </script>

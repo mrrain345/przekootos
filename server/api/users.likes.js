@@ -71,15 +71,15 @@ module.exports = (api, db, helper) => {
   // Like/Dislike a user
   api.put('/users/:id/like', async (req, res) => {
     if (!req.params.id) return res.sendStatus(404);
-    const like = req.body.like;
+    const { like } = req.body;
     if (like !== true && like !== false) return res.sendStatus(404);
-    
+
     const userid = await helper.get_userid(req);
     if (!userid) return res.sendStatus(404);
 
     if (req.params.id === 'me') return res.json({ like: false });
     if (req.params.id === userid) return res.json({ like: false });
-    
+
     const query = await db.query(
       'SELECT * FROM likes WHERE "user"=$1 AND target=$2 AND timestamp >= DATE_TRUNC(\'day\', CURRENT_TIMESTAMP)',
       [userid, req.params.id],
@@ -87,7 +87,7 @@ module.exports = (api, db, helper) => {
 
     const liked = (query.rows.length !== 0);
 
-    if (like === liked) return res.json({ like: like });
+    if (like === liked) return res.json({ like });
 
     if (like) {
       await db.query(
@@ -96,13 +96,12 @@ module.exports = (api, db, helper) => {
       ).catch(err => console.error(err));
 
       return res.json({ like: true });
-    } else {
-      await db.query(
-        'DELETE FROM likes WHERE "user"=$1 AND "target"=$2',
-        [userid, req.params.id],
-      ).catch(err => console.error(err));
-
-      return res.json({ like: false });
     }
+    await db.query(
+      'DELETE FROM likes WHERE "user"=$1 AND "target"=$2',
+      [userid, req.params.id],
+    ).catch(err => console.error(err));
+
+    return res.json({ like: false });
   });
 };

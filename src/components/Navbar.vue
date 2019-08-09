@@ -16,17 +16,17 @@ export default {
   }),
   created() {
     fetch('/api/session')
-    .then(res => res.json())
-    .then(res => { 
-      this.logged = res.ok;
-      this.loaded = true;
-    });
+      .then(res => res.json())
+      .then((res) => {
+        this.logged = res.ok;
+        this.loaded = true;
+      });
 
     this.$root.$on('login', (login) => {
       this.logged = login;
     });
-  }
-}
+  },
+};
 </script>
 
 

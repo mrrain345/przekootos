@@ -49,14 +49,14 @@ export default {
           password: this.password,
         }),
       })
-      .then(res => res.json())
-      .then((res) => {
-        this.alert = !res.ok;
-        if (res.ok) {
-          this.$root.$emit('login', true);
-          this.$router.push({ path: '/' });
-        }
-      });
+        .then(res => res.json())
+        .then((res) => {
+          this.alert = !res.ok;
+          if (res.ok) {
+            this.$root.$emit('login', true);
+            this.$router.push({ path: '/' });
+          }
+        });
     },
   },
 };
