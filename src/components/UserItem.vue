@@ -43,6 +43,7 @@ export default {
   },
   beforeMount() {
     if (!this.me) return;
+
     fetch(`/api/users/${this.user.id}/like`)
       .then(res => res.json())
       .then((res) => {
