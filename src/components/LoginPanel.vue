@@ -52,8 +52,10 @@ export default {
       .then(res => res.json())
       .then((res) => {
         this.alert = !res.ok;
-        console.log(res);
-        if (res.ok) this.$router.push({ path: '/' });
+        if (res.ok) {
+          this.$root.$emit('login', true);
+          this.$router.push({ path: '/' });
+        }
       });
     },
   },

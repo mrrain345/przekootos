@@ -9,6 +9,7 @@ export default {
     fetch('/api/session', { method: 'DELETE' })
       .then(res => res.json())
       .then(() => {
+        this.$root.$emit('login', false);
         this.$router.push({ path: '/' });
       });
   },

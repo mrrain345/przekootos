@@ -88,7 +88,10 @@ export default {
       })
       .then(res => res.json())
       .then((res) => {
-        if (res.ok) this.$router.push({ path: '/' });
+        if (res.ok) {
+          this.$root.$emit('login', true);
+          this.$router.push({ path: '/' });
+        }
         else this.setAlerts(res);
       });
     },
