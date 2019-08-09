@@ -5,7 +5,8 @@
       <div id="email">{{user.email}}</div>
     </div>
     <div id="right">
-      <i class="material-icons noselect" :class="{ active: active }" @click="click">thumb_up</i>
+      <!--<i class="material-icons noselect" :class="{ active: active }" @click="click">thumb_up</i>-->
+      <img id="przekootos" class="noselect" :class="{ active: active }" @click="click" src="/przekootos.png"/>
     </div>
     <div style="clear:both;"></div>
   </div>
@@ -46,23 +47,24 @@ export default {
   height: 75px;
 }
 
-i.material-icons {
-  font-size: 75px;
-  color: #cfd8dc;
+#przekootos {
+  filter: grayscale(100%) contrast(150%);
   cursor: pointer;
   transition: all 0.2s;
+  width: 100%;
+  user-select: none;
 }
 
-i.material-icons:hover {
-  color: #eceff1;
+#przekootos:hover {
+  filter: grayscale(100%) contrast(180%);
 }
 
-i.material-icons.active {
-  color: #4CAF50;
+#przekootos.active {
+  filter: grayscale(0%) contrast(80%);
 }
 
-i.material-icons.active:hover {
-  color: #43a047;
+#przekootos.active:hover {
+  filter: grayscale(0%) contrast(100%);
 }
 
 #panel:first-child {
@@ -83,14 +85,5 @@ i.material-icons.active:hover {
 
 #like {
   border-left: dotted #90CAF9 1px;
-}
-
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 </style>
