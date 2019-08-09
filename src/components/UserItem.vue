@@ -4,8 +4,7 @@
       <div id="name">{{user.username}}</div>
       <div id="email">{{user.email}}</div>
     </div>
-    <div id="right">
-      <!--<i class="material-icons noselect" :class="{ active: active }" @click="click">thumb_up</i>-->
+    <div id="right" v-if="display(user)">
       <img id="przekootos" class="noselect" :class="{ active: active }" @click="click" src="/przekootos.png"/>
     </div>
     <div style="clear:both;"></div>
@@ -15,15 +14,40 @@
 <script>
 export default {
   name: 'UserItem',
-  props: ['id', 'user'],
+  props: ['user', 'me'],
   data: () => ({
     active: false,
+    loaded: false,
   }),
   methods: {
     click() {
       this.active = !this.active;
+
+      fetch('/api/users/'+this.user.id+'/like', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ like: this.active }),
+      })
+      .then(res => res.json())
+      .then((res) => {
+        this.active = res.like;
+      });
+    },
+    display(user) {
+      return this.loaded && this.me !== null && user.id !== this.me;
     },
   },
+  beforeMount() {
+    if (!this.me) return;
+    fetch('/api/users/'+this.user.id+'/like')
+    .then(res => res.json())
+    .then((res) => {
+      this.active = res.like;
+      this.loaded = true;
+    });
+  }
 };
 </script>
 

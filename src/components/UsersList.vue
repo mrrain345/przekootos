@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <div v-for="(user, id) in users" :key="id">
-      <UserItem :id="id" :user="user"/>
+    <div v-for="user in users" :key="user.id">
+      <UserItem :me="me" :user="user"/>
     </div>
   </div>
 </template>
@@ -16,11 +16,19 @@ export default {
   },
   data: () => ({
     users: [],
+    me: null,
   }),
-  mounted() {
+  beforeMount() {
+    fetch('/api/session')
+    .then(res => res.json())
+    .then(res => { 
+      if (res.ok) this.me = res.user.id;
+      else this.me = null;
+    });
+
     fetch('/api/users')
-      .then(res => res.json())
-      .then((res) => { this.users = res; });
+    .then(res => res.json())
+    .then((res) => { this.users = res; });
   },
 };
 </script>

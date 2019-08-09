@@ -49,12 +49,12 @@ export default {
           password: this.password,
         }),
       })
-        .then(res => res.json())
-        .then((res) => {
-          this.alert = !res.ok;
-          console.log(res);
-          if (res.ok) this.$router.push({ path: '/' });
-        });
+      .then(res => res.json())
+      .then((res) => {
+        this.alert = !res.ok;
+        console.log(res);
+        if (res.ok) this.$router.push({ path: '/' });
+      });
     },
   },
 };

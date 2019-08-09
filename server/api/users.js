@@ -4,7 +4,7 @@ const hash = require('password-hash');
 module.exports = (api, db, helper) => {
   // get all users
   api.get('/users/', async (req, res) => {
-    const query = await db.query('SELECT * FROM users');
+    const query = await db.query('SELECT * FROM users ORDER BY username ASC');
     for (let i = 0; i < query.rows.length; i += 1) {
       query.rows[i].password = undefined;
     }
