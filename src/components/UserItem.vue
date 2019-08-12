@@ -23,6 +23,7 @@ export default {
   }),
   methods: {
     click() {
+      const lastActive = this.active;
       this.active = !this.active;
 
       fetch(`/api/users/${this.user.id}/like`, {
@@ -35,6 +36,9 @@ export default {
         .then(res => res.json())
         .then((res) => {
           this.active = res.like;
+        })
+        .catch(() => {
+          this.active = lastActive;
         });
     },
     display(user) {
@@ -50,7 +54,7 @@ export default {
         this.active = res.like;
         this.loaded = true;
       });
-  },
+  }
 };
 </script>
 

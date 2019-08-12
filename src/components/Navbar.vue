@@ -1,6 +1,7 @@
 <template>
   <div id="nav" v-if="loaded">
-      <router-link to="/">Home</router-link>
+      <router-link to="/" class="exact">Home</router-link>
+      <router-link to="/ranking">Ranking</router-link>
       <router-link to="/login" v-if="!logged">Login</router-link>
       <router-link to="/register" v-if="!logged">Register</router-link>
       <router-link to="/logout" v-if="logged">Logout</router-link>
@@ -30,7 +31,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 #nav {
   padding: 30px;
   text-align: center;
@@ -48,7 +49,11 @@ export default {
   border-left: none;
 }
 
-#nav a.router-link-exact-active {
+#nav a.router-link-active:not(.exact) {
+  color: #2196f3;
+}
+
+#nav a.router-link-exact-active.exact {
   color: #2196f3;
 }
 </style>

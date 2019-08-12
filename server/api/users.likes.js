@@ -6,11 +6,11 @@ module.exports = (api, db, helper) => {
 
     const query = (time !== 'all')
       ? await db.query(
-        'SELECT target AS id, (SELECT username FROM users WHERE id=target), (SELECT email FROM users WHERE id=target), count(*) AS likes FROM likes WHERE timestamp >= DATE_TRUNC($1, CURRENT_TIMESTAMP) GROUP BY target',
+        'SELECT target AS id, (SELECT username FROM users WHERE id=target), (SELECT email FROM users WHERE id=target), count(*) AS likes FROM likes WHERE timestamp >= DATE_TRUNC($1, CURRENT_TIMESTAMP) GROUP BY target ORDER BY likes DESC, username ASC',
         [time],
       ).catch(err => console.error(err))
       : await db.query(
-        'SELECT target AS id, (SELECT username FROM users WHERE id=target), (SELECT email FROM users WHERE id=target), count(*) AS likes FROM likes GROUP BY target',
+        'SELECT target AS id, (SELECT username FROM users WHERE id=target), (SELECT email FROM users WHERE id=target), count(*) AS likes FROM likes GROUP BY target ORDER BY likes DESC, username ASC',
       ).catch(err => console.error(err));
 
     return res.json({ users: query.rows });

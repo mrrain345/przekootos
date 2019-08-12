@@ -14,6 +14,15 @@ export default new Router({
       component: Home,
     },
     {
+      path: '/ranking/:time',
+      name: 'ranking',
+      component: () => import(/* webpackChunkName: "ranking" */ './views/Ranking.vue'),
+    },
+    {
+      path: '/ranking',
+      redirect: '/ranking/day',
+    },
+    {
       path: '/register',
       name: 'register',
       component: () => import(/* webpackChunkName: "register" */ './views/Register.vue'),
@@ -27,6 +36,11 @@ export default new Router({
       path: '/logout',
       name: 'logout',
       component: () => import(/* webpackChunkName: "logout" */ './views/Logout.vue'),
+    },
+    {
+      path: '*',
+      name: 'not-found',
+      component: () => import(/* webpackChunkName: "not-found" */ './views/NotFound.vue'),
     },
   ],
 });

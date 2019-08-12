@@ -21,7 +21,7 @@ export default {
     me: null,
     loaded: 0,
   }),
-  beforeMount() {
+  created() {
     this.loaded = 0;
 
     fetch('/api/session')
