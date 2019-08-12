@@ -1,4 +1,5 @@
 module.exports = {
+  port: 3000,
   cookieSecret: 'as7aVtnSDxa20LfOXDBzdEII4cSVezdp',
   postgres: {
     user: 'postgres',
