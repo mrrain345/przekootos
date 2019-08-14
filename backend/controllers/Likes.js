@@ -9,6 +9,7 @@ module.exports = class Likes {
     this.get('/users/:id/likes/:time/count', this.get_likes_count);
     this.get('/users/:id/like', this.get_like);
     this.put('/users/:id/like', this.put_like);
+    this.get('/likes_limit', this.likes_limit_r);
   }
 
   async get_timestamp(time) {
@@ -127,25 +128,54 @@ module.exports = class Likes {
     const user = await this.helper.get_userid(req);
     if (!user) return res.sendStatus(404);
 
-    if (req.params.id === 'me') return res.json({ like: false });
-    if (req.params.id === user) return res.json({ like: false });
+    const { limit, left } = await this.likes_limit(user);
+    if (req.params.id === 'me') return res.json({ like: false, limit, left });
+    if (req.params.id === user) return res.json({ like: false, limit, left });
 
     const liked = await this.models.Likes.findOne({
       where: { timestamp, user, target: req.params.id },
     }).catch(err => console.log(err));
 
-    if (!like === !liked) return res.json({ like });
+    if (!like === !liked) return res.json({ like, limit, left });
 
     if (like) {
+      if (!left) {
+        return res.json({ like: false, limit, left });
+      }
+
       await this.models.Likes.create({
         user,
         target: req.params.id,
       }).catch(err => console.log(err));
-      return res.json({ like: true });
+      return res.json({ like: true, limit, left: left-1 });
     }
     await this.models.Likes.destroy({
       where: { id: liked.id },
     }).catch(err => console.log(err));
-    return res.json({ like: false });
+    return res.json({ like: false, limit, left: left+1 });
+  }
+
+  async likes_limit(id) {
+    const timestamp = { [Op.gte]: await this.get_timestamp('day') };
+
+    const likes = await this.models.Likes.findOne({
+      attributes: ['user', [Sequelize.fn('count', '*'), 'count']],
+      where: { user: id, timestamp },
+      group: ['user'],
+    }).catch(err => console.log(err));
+
+    const limit = this.config.likes_limit;
+    if (!likes) return { limit, left: limit };
+
+    const left = (likes.dataValues.count > limit) ? 0 : (limit - likes.dataValues.count);
+    return { limit, left };
+  }
+
+  async likes_limit_r(req, res) {
+    const user = await this.helper.get_userid(req);
+    if (!user) return res.json({ ok: false, limit: this.config.likes_limit });
+    const { limit, left } = await this.likes_limit(user)
+
+    return res.json({ ok: true, limit, left });
   }
 };

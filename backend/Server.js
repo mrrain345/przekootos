@@ -39,6 +39,7 @@ module.exports = class Server {
       controller.helper = this.helper;
       controller.sequelize = this.sequelize;
       controller.models = this.models;
+      controller.config = this.config;
 
       controller.get = (path, method) => {
         router.get(path, method.bind(controller));

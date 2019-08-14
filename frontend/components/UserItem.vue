@@ -36,6 +36,10 @@ export default {
         .then(res => res.json())
         .then((res) => {
           this.active = res.like;
+          this.$root.$emit('like', {
+            limit: res.limit,
+            left: res.left,
+          });
         })
         .catch(() => {
           this.active = lastActive;

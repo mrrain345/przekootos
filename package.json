@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "server": "nodemon --watch server server/index.js",
+    "server": "nodemon --watch backend backend/index.js",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint || true; eslint 'server/**' --fix || true"
+    "lint": "vue-cli-service lint || true; eslint 'backend/**' --fix || true"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
