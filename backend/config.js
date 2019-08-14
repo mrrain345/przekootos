@@ -9,5 +9,6 @@ module.exports = {
     database: 'postgres',
     password: 'qwerty',
     port: 5432,
+    logging: false,
   },
 };

@@ -20,6 +20,7 @@ module.exports = class Server {
         host: this.config.db.host,
         dialect: this.config.db.engine,
         port: this.config.db.port,
+        logging: this.config.db.logging,
       },
     );
 

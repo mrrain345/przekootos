@@ -26,7 +26,7 @@ module.exports = class Likes {
       ? { [Op.gte]: await this.get_timestamp(time) }
       : { [Op.not]: null };
 
-    const users = [];
+    let users = [];
     await this.models.Likes.findAll({
       attributes: ['target', [Sequelize.fn('count', '*'), 'count']],
       where: { timestamp },
@@ -42,7 +42,7 @@ module.exports = class Likes {
           })
             .then((usr) => {
               const user = usr.dataValues;
-              user.likes = count;
+              user.likes = parseInt(count);
               users.push(user);
             })
             .catch(err => console.log(err));
@@ -51,6 +51,7 @@ module.exports = class Likes {
         return Promise.all(promises);
       }).catch(err => console.log(err));
 
+    users.sort((a, b) => { return b.likes - a.likes });
     return res.json({ users });
   }
 
