@@ -1,3 +1,5 @@
+const path = require("path");
+
 module.exports = {
   lintOnSave: true,
   devServer: {
@@ -6,5 +8,14 @@ module.exports = {
         target: 'http://localhost:3000',
       },
     },
+  },
+  chainWebpack: config => {
+    config
+      .entry("app")
+      .clear()
+      .add("./frontend/main.js")
+      .end();
+    config.resolve.alias
+      .set("@", path.join(__dirname, "./frontend"))
   },
 };
