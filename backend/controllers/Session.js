@@ -1,4 +1,5 @@
 const hash = require('password-hash');
+const HTTPStatus = require('http-status');
 
 module.exports = class Session {
   routes() {
@@ -18,7 +19,7 @@ module.exports = class Session {
   async post_session(req, res) {
     // { email, password }
 
-    if (!req.body.email || !req.body.password) return res.sendStatus(404);
+    if (!req.body.email || !req.body.password) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const user = await this.models.Users.findOne({
       where: { email: req.body.email },

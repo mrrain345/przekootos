@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const HTTPStatus = require('http-status');
 
 const { Op } = Sequelize;
 
@@ -21,7 +22,7 @@ module.exports = class Likes {
   // Get all likes (time: day/week/month/year/all, default: all)
   async get_all_likes(req, res) {
     const time = (!req.params.time) ? 'all' : req.params.time;
-    if (!['day', 'week', 'month', 'year', 'all'].includes(time)) return res.sendStatus(404);
+    if (!['day', 'week', 'month', 'year', 'all'].includes(time)) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const timestamp = (time !== 'all')
       ? { [Op.gte]: await this.get_timestamp(time) }
       : { [Op.not]: null };
@@ -51,16 +52,16 @@ module.exports = class Likes {
         return Promise.all(promises);
       }).catch(err => console.log(err));
 
-    users.sort((a, b) => { return b.likes - a.likes });
+    users.sort((a, b) => b.likes - a.likes);
     return res.json({ users });
   }
 
   // Get list of user likes (time: day/week/month/year/all, default: all)
   async get_likes(req, res) {
     const time = (!req.params.time) ? 'all' : req.params.time;
-    if (!['day', 'week', 'month', 'year', 'all'].includes(time)) return res.sendStatus(404);
+    if (!['day', 'week', 'month', 'year', 'all'].includes(time)) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : req.params.id;
-    if (!target) return res.sendStatus(404);
+    if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const timestamp = (time !== 'all')
       ? { [Op.gte]: await this.get_timestamp(time) }
       : { [Op.not]: null };
@@ -85,9 +86,9 @@ module.exports = class Likes {
 
   // Get count of user likes (time: day/week/month/year/all)
   async get_likes_count(req, res) {
-    if (!['day', 'week', 'month', 'year', 'all'].includes(req.params.time)) return res.sendStatus(404);
+    if (!['day', 'week', 'month', 'year', 'all'].includes(req.params.time)) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : req.params.id;
-    if (!target) return res.sendStatus(404);
+    if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const timestamp = (req.params.time !== 'all')
       ? { [Op.gte]: await this.get_timestamp(req.params.time) }
       : { [Op.not]: null };
@@ -105,12 +106,12 @@ module.exports = class Likes {
 
   // Check if you gave a like today
   async get_like(req, res) {
-    if (!req.params.id) return res.sendStatus(404);
+    if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     if (req.params.id === 'me') return res.json({ like: false });
     const timestamp = { [Op.gte]: await this.get_timestamp('day') };
 
     const user = await this.helper.get_userid(req);
-    if (!user) return res.sendStatus(404);
+    if (!user) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const like = await this.models.Likes.findOne({
       where: { timestamp, user, target: req.params.id },
@@ -121,13 +122,13 @@ module.exports = class Likes {
 
   // Like/Dislike a user
   async put_like(req, res) {
-    if (!req.params.id) return res.sendStatus(404);
+    if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const { like } = req.body;
-    if (like !== true && like !== false) return res.sendStatus(404);
+    if (like !== true && like !== false) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const timestamp = { [Op.gte]: await this.get_timestamp('day') };
 
     const user = await this.helper.get_userid(req);
-    if (!user) return res.sendStatus(404);
+    if (!user) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const { limit, left } = await this.likes_limit(user);
     if (req.params.id === 'me') return res.json({ like: false, limit, left });

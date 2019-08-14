@@ -1,5 +1,6 @@
 const validator = require('validator');
 const hash = require('password-hash');
+const HTTPStatus = require('http-status');
 
 module.exports = class Users {
   routes() {
@@ -20,7 +21,7 @@ module.exports = class Users {
 
   // get user
   async get_user(req, res) {
-    if (!req.params.id) return res.sendStatus(404);
+    if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const user = await this.models.Users.findByPk(req.params.id, {
       attributes: { exclude: ['password'] },
     }).catch(err => console.log(err));
