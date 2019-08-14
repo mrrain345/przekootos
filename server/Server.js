@@ -1,29 +1,44 @@
 const express = require('express');
 const cookies = require('cookie-parser');
-const { Client } = require('pg');
+const Sequelize = require('sequelize');
 const helper = require('./helper');
 
 module.exports = class Server {
-  constructor(controllers, config) {
-    this.controllers = controllers;
-    this.config = config;
+  constructor(data) {
+    this.controllers = data.controllers;
+    this.config = data.config;
 
     this.express = express();
     this.express.use(express.json());
     this.express.use(cookies(this.config.cookieSecret));
 
-    this.db = new Client(this.config.postgres);
-    this.db.connect();
+    this.sequelize = new Sequelize(
+      this.config.db.database,
+      this.config.db.user,
+      this.config.db.password,
+      {
+        host: this.config.db.host,
+        dialect: this.config.db.engine,
+        port: this.config.db.port,
+      },
+    );
 
-    this.helper = helper(this.db, cookies);
+    // initialize models
+    this.models = {};
+    Object.keys(data.models).forEach((model) => {
+      this.models[model] = data.models[model].init(this.sequelize);
+    });
+
+    this.helper = helper(cookies, this.sequelize, this.models);
 
     // set controllers default fields
     for (let i = 0; i < this.controllers.length; i += 1) {
       const controller = this.controllers[i];
       const router = express.Router();
       controller.router = router;
-      controller.db = this.db;
       controller.helper = this.helper;
+      controller.sequelize = this.sequelize;
+      controller.models = this.models;
 
       controller.get = (path, method) => {
         router.get(path, method.bind(controller));

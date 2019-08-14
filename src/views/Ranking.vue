@@ -23,7 +23,7 @@ export default {
   },
   data: () => ({
     users: [],
-    time: 'day'
+    time: 'day',
   }),
   methods: {
     updateRanking(time) {
@@ -34,22 +34,22 @@ export default {
       }
 
       fetch(`/api/users/all/likes/${this.time}`)
-      .then(res => res.json())
-      .then((res) => {
-        this.users = res.users;
-      });
+        .then(res => res.json())
+        .then((res) => {
+          this.users = res.users;
+        });
     },
   },
   created() {
     this.updateRanking(this.$route.params.time);
   },
-  beforeRouteUpdate (to, from, next) {
+  beforeRouteUpdate(to, from, next) {
     if (!['day', 'week', 'month', 'year', 'all'].includes(to.params.time)) {
       return next('/ranking');
     }
 
     this.updateRanking(to.params.time);
-    next();
+    return next();
   },
 };
 </script>

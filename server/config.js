@@ -1,7 +1,8 @@
 module.exports = {
   port: 3000,
   cookieSecret: 'as7aVtnSDxa20LfOXDBzdEII4cSVezdp',
-  postgres: {
+  db: {
+    engine: 'postgres',
     user: 'postgres',
     host: 'localhost',
     database: 'postgres',

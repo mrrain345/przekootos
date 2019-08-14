@@ -1,6 +1,6 @@
 const cryptoRandom = require('crypto-random-string');
 
-module.exports = (db, cookies) => ({
+module.exports = (cookies, sequelize, models) => ({
   cookies,
   get_session: (req) => {
     const { session } = req.signedCookies;
@@ -12,47 +12,44 @@ module.exports = (db, cookies) => ({
     const { session } = req.signedCookies;
     if (!session || session.length !== 32) return null;
 
-    const query = await db.query(
-      'SELECT "user" FROM sessions WHERE "session"=$1 LIMIT 1',
-      [session],
-    ).catch(err => console.error(err));
+    const sess = await models.Sessions.findOne({
+      where: { session },
+    }).catch(err => console.log(err));
 
-    if (query.rows.length !== 1) return null;
-    return query.rows[0].user;
+    if (!sess) return null;
+    return sess.user;
   },
 
   get_user: async (req) => {
     const { session } = req.signedCookies;
     if (!session || session.length !== 32) return null;
 
-    const query = await db.query(
-      'SELECT * FROM users WHERE id=(SELECT "user" FROM sessions WHERE "session"=$1 LIMIT 1) LIMIT 1',
-      [session],
-    ).catch(err => console.error(err));
+    const sess = await models.Sessions.findOne({
+      where: { session },
+    }).catch(err => console.log(err));
+    if (!sess) return null;
 
-    if (query.rows.length !== 1) return null;
-    const user = query.rows[0];
-    user.password = undefined;
-    return { id: user.id, userdata: user, session };
+    const user = await models.Users.findOne({
+      attributes: { exclude: ['password'] },
+      where: { id: sess.user },
+    }).catch(err => console.log(err));
+    if (!user) return null;
+
+    return { id: user.id, userdata: user };
   },
 
   create_session: async (res, id) => {
-    const query = await db.query(
-      'SELECT * FROM users WHERE id=$1 LIMIT 1',
-      [id],
-    ).catch(err => console.error(err));
+    const user = await models.Users.findByPk(id, {
+      attributes: { exclude: ['password'] },
+    }).catch(err => console.log(err));
 
-    if (query.rows.length !== 1) return null;
-
-    const user = query.rows[0];
-    user.password = undefined;
-
+    if (!user) return null;
     const session = cryptoRandom({ length: 32 });
 
-    await db.query(
-      'INSERT INTO sessions ("user", "session") VALUES ($1, $2)',
-      [user.id, session],
-    ).catch(err => console.error(err));
+    await models.Sessions.create({
+      user: user.id,
+      session,
+    }).catch(err => console.log(err));
 
     res.cookie('session', session, {
       maxAge: 1000 * 60 * 60 * 30, // session for 30 days
@@ -63,7 +60,6 @@ module.exports = (db, cookies) => ({
     return {
       id: user.id,
       userdata: user,
-      session,
     };
   },
 });

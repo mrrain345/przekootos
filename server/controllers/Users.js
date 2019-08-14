@@ -10,20 +10,21 @@ module.exports = class Users {
 
   // get all users
   async get_users(req, res) {
-    const query = await this.db.query('SELECT * FROM users ORDER BY username ASC');
-    for (let i = 0; i < query.rows.length; i += 1) {
-      query.rows[i].password = undefined;
-    }
-    res.json(query.rows);
+    const users = await this.models.Users.findAll({
+      attributes: { exclude: ['password'] },
+      order: [['username', 'ASC']],
+    }).catch(err => console.log(err));
+
+    res.json(users);
   }
 
   // get user
   async get_user(req, res) {
     if (!req.params.id) return res.sendStatus(404);
-    const query = await this.db.query('SELECT * FROM users WHERE id=$1 LIMIT 1', [req.params.id]);
-    if (query.rows.length !== 1) return res.sendStatus(404);
-    query.rows[0].password = undefined;
-    return res.json(query.rows[0]);
+    const user = await this.models.Users.findByPk(req.params.id, {
+      attributes: { exclude: ['password'] },
+    }).catch(err => console.log(err));
+    return res.json(user);
   }
 
   // add new user
@@ -55,31 +56,28 @@ module.exports = class Users {
       errors.push({ code: 7, target: 'cpassword', message: 'Passwords do not match' });
     }
 
-    const email = await this.db.query(
-      'SELECT id FROM users WHERE email=$1 LIMIT 1',
-      [req.body.email],
-    ).catch(err => console.error(err));
+    const email = await this.models.Users.findOne({
+      attributes: ['id'],
+      where: { email: req.body.email },
+    }).catch(err => console.log(err));
 
-    if (email.rows.length !== 0) {
+    if (email) {
       errors.push({ code: 8, target: 'email', message: 'Email is used' });
     }
 
     const ok = errors.length === 0;
-    let user;
+    let usr;
 
     if (ok) {
-      const query = await this.db.query(
-        'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id',
-        [`${req.body.fname} ${req.body.lname}`, hash.generate(req.body.password), req.body.email],
-      ).catch(err => console.error(err));
+      const user = await this.models.Users.create({
+        username: `${req.body.fname} ${req.body.lname}`,
+        password: hash.generate(req.body.password),
+        email: req.body.email,
+      }).catch(err => console.log(err));
 
-      user = await this.helper.create_session(res, query.rows[0].id);
+      usr = await this.helper.create_session(res, user.id);
     }
 
-    res.json({
-      ok,
-      errors,
-      user,
-    });
+    res.json({ ok, errors, user: usr });
   }
 };

@@ -54,7 +54,7 @@ export default {
         this.active = res.like;
         this.loaded = true;
       });
-  }
+  },
 };
 </script>
 

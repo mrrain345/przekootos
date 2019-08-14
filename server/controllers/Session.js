@@ -20,20 +20,18 @@ module.exports = class Session {
 
     if (!req.body.email || !req.body.password) return res.sendStatus(404);
 
-    const query = await this.db.query(
-      'SELECT id, password FROM users WHERE email=$1 LIMIT 1',
-      [req.body.email],
-    ).catch(err => console.error(err));
+    const user = await this.models.Users.findOne({
+      where: { email: req.body.email },
+    }).catch(err => console.log(err));
 
-    if (query.rows.length !== 1) return res.json({ ok: false });
-    if (!hash.verify(req.body.password, query.rows[0].password)) return res.json({ ok: false });
+    if (!user) return res.json({ ok: false });
+    if (!hash.verify(req.body.password, user.password)) return res.json({ ok: false });
 
-    const { id } = query.rows[0];
-    const user = await this.helper.create_session(res, id);
+    const usr = await this.helper.create_session(res, user.id);
 
     return res.json({
       ok: true,
-      user,
+      user: usr,
     });
   }
 
@@ -42,13 +40,11 @@ module.exports = class Session {
     const session = this.helper.get_session(req);
     if (!session) return res.json({ ok: false });
 
-    await this.db.query(
-      'DELETE FROM sessions WHERE "session"=$1',
-      [session],
-    ).catch(err => console.error(err));
+    await this.models.Sessions.destroy({
+      where: { session },
+    }).catch(err => console.log(err));
 
     res.clearCookie('session');
-
     return res.json({ ok: true });
   }
 };
