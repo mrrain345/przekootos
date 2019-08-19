@@ -11,4 +11,8 @@ module.exports = {
     port: 5432,
     logging: false,
   },
+  github: {
+    client_id: '6f85928125d9b221f454',
+    secret: 'd90a841a6f9bbfaecdb605dd9daa1077a1d69b80',
+  },
 };
