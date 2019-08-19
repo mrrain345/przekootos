@@ -18,7 +18,9 @@
       </div>
 
       <div class="row">
-        <div class="col-6"></div>
+        <div class="col-6">
+          <GitHub/>
+        </div>
         <div class="col-6">
           <button type="submit" class="login-btn btn btn-success" @click="login">
             Login
@@ -30,8 +32,13 @@
 </template>
 
 <script>
+import GitHub from '@/components/GitHub.vue';
+
 export default {
   name: 'LoginPanel',
+  components: {
+    GitHub,
+  },
   data: () => ({
     email: '',
     password: '',

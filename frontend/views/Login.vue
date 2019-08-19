@@ -4,7 +4,6 @@
       <div class="col-1 col-sm-2 d-md-none"></div>
       <LoginPanel/>
       <Banner msg="Login to your account!"/>
-      <GitHub/>
     </div>
   </div>
 </template>
@@ -12,14 +11,12 @@
 <script>
 import LoginPanel from '@/components/LoginPanel.vue';
 import Banner from '@/components/Banner.vue';
-import GitHub from '@/components/GitHub.vue';
 
 export default {
   name: 'login',
   components: {
     LoginPanel,
     Banner,
-    GitHub,
   },
   data: () => ({
     show: false,

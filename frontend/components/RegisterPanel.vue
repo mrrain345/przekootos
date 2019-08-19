@@ -44,7 +44,9 @@
       </div>
 
       <div class="row">
-        <div class="col-6"></div>
+        <div class="col-6">
+          <GitHub/>
+        </div>
         <div class="col-6">
           <button type="button" class="create-btn btn btn-success d-none d-xl-block"
             @click="create">Create Account
@@ -59,8 +61,13 @@
 </template>
 
 <script>
+import GitHub from '@/components/GitHub.vue';
+
 export default {
   name: 'RegisterPanel',
+  components: {
+    GitHub,
+  },
   data: () => ({
     form: {
       fname: '',
