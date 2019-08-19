@@ -16,6 +16,7 @@ module.exports = {
   },
   rules: {
     'no-console': 'off',
-    'camelcase': 'off'
+    'camelcase': 'off',
+    'class-methods-use-this': 'off',
   },
 };

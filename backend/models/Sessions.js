@@ -7,7 +7,7 @@ module.exports.init = (sequelize) => {
   class Sessions extends Sequelize.Model {}
   Sessions.init({
     session: {
-      type: Sequelize.STRING(32), allowNull: false, autoIncrement: true, primaryKey: true,
+      type: Sequelize.STRING(80), allowNull: false, autoIncrement: true, primaryKey: true,
     },
     user: { type: Sequelize.INTEGER, allowNull: false, references: { model: Users, key: 'id' } },
   }, { sequelize, modelName: 'sessions' });

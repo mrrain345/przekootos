@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
   lintOnSave: true,
@@ -9,13 +9,13 @@ module.exports = {
       },
     },
   },
-  chainWebpack: config => {
+  chainWebpack: (config) => {
     config
-      .entry("app")
+      .entry('app')
       .clear()
-      .add("./frontend/main.js")
+      .add('./frontend/main.js')
       .end();
     config.resolve.alias
-      .set("@", path.join(__dirname, "./frontend"))
+      .set('@', path.join(__dirname, './frontend'));
   },
 };

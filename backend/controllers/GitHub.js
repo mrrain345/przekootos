@@ -3,7 +3,7 @@ const HTTPStatus = require('http-status');
 
 module.exports = class GitHub {
   routes() {
-    this.get('/github', this.github);
+    this.get('/login/github', this.github);
   }
 
   async github(req, res) {
@@ -19,17 +19,16 @@ module.exports = class GitHub {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
       body: JSON.stringify(data),
     })
-    .then(res => res.json())
-    .catch(err => console.log(err));
+      .then(_res => _res.json())
+      .catch(err => console.log(err));
 
     if (result.error) return res.json(result);
-    console.log(result);
 
-    const access_token = result.access_token;
+    const { access_token } = result;
     const scopes = result.scope.split(',');
     const hasEmail = scopes.includes('user:email');
     const hasUser = scopes.includes('read:user');
@@ -37,21 +36,24 @@ module.exports = class GitHub {
     if (!hasEmail && !hasUser) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const user = await this.get_userdata(access_token);
 
-    await this.models.Users.findOne({
+    const usr = await this.models.Users.findOne({
       attributes: { exclude: ['password'] },
       where: { email: user.email, usertype: 'GITHUB' },
     })
-    .then(async usr => {
-      if (!usr) {
-        await this.models.Users.create({
-          username: user.username,
-          password: null,
-          email: user.email,
-          usertype: 'GITHUB',
-        });
-      }
-      else {
-        await this.models.Users.update({
+      .then(async (_usr) => {
+        if (!_usr) {
+          return this.models.Users.create({
+            username: user.username,
+            password: null,
+            email: user.email,
+            usertype: 'GITHUB',
+          }, {
+            returning: ['id'],
+          })
+            .then(us => us[1][0].dataValues);
+        }
+
+        return this.models.Users.update({
           username: user.username,
           password: null,
           email: user.email,
@@ -60,29 +62,34 @@ module.exports = class GitHub {
           where: {
             email: user.email,
             usertype: 'GITHUB',
-          }
-        });
-      }
-    })
-    .catch(err => console.log(err));
+          },
+          returning: true,
+        })
+          .then(us => us[1][0].dataValues);
+      })
+      .catch(err => console.log(err));
 
+    await this.helper.create_github_session(res, usr.id, access_token);
     return res.json(user);
   }
 
   async get_userdata(token) {
     const user = await fetch(`https://api.github.com/user?access_token=${token}`, {
-      headers: { 'Accept': 'application/json' }
+      headers: { Accept: 'application/json' },
     })
-    .then(res => res.json())
-    .catch(err => console.log(err));
+      .then(res => res.json())
+      .catch(err => console.log(err));
 
     const emails = await fetch(`https://api.github.com/user/emails?access_token=${token}`, {
-      headers: { 'Accept': 'application/json' }
+      headers: { Accept: 'application/json' },
     })
-    .then(res => res.json())
-    .catch(err => console.log(err));
+      .then(res => res.json())
+      .catch(err => console.log(err));
 
-    const email = (emails.length === 1) ? emails[0].email : emails.find(email => email.primary).email;
+    const email = (emails.length === 1)
+      ? emails[0].email
+      : emails.find(e => e.primary).email;
+
     return { username: user.name, email };
   }
-}
+};

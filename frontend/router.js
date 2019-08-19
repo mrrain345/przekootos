@@ -33,6 +33,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "login" */ './views/Login.vue'),
     },
     {
+      path: '/login/github',
+      name: 'github',
+      component: () => import(/* webpackChunkName: "github" */ './views/GitHub.vue'),
+    },
+    {
       path: '/logout',
       name: 'logout',
       component: () => import(/* webpackChunkName: "logout" */ './views/Logout.vue'),

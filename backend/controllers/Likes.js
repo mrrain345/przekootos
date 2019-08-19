@@ -27,7 +27,7 @@ module.exports = class Likes {
       ? { [Op.gte]: await this.get_timestamp(time) }
       : { [Op.not]: null };
 
-    let users = [];
+    const users = [];
     await this.models.Likes.findAll({
       attributes: ['target', [Sequelize.fn('count', '*'), 'count']],
       where: { timestamp },
@@ -43,7 +43,7 @@ module.exports = class Likes {
           })
             .then((usr) => {
               const user = usr.dataValues;
-              user.likes = parseInt(count);
+              user.likes = parseInt(count, 10);
               users.push(user);
             })
             .catch(err => console.log(err));
@@ -149,12 +149,12 @@ module.exports = class Likes {
         user,
         target: req.params.id,
       }).catch(err => console.log(err));
-      return res.json({ like: true, limit, left: left-1 });
+      return res.json({ like: true, limit, left: left - 1 });
     }
     await this.models.Likes.destroy({
       where: { id: liked.id },
     }).catch(err => console.log(err));
-    return res.json({ like: false, limit, left: left+1 });
+    return res.json({ like: false, limit, left: left + 1 });
   }
 
   async likes_limit(id) {
@@ -176,7 +176,7 @@ module.exports = class Likes {
   async likes_limit_r(req, res) {
     const user = await this.helper.get_userid(req);
     if (!user) return res.json({ ok: false, limit: this.config.likes_limit });
-    const { limit, left } = await this.likes_limit(user)
+    const { limit, left } = await this.likes_limit(user);
 
     return res.json({ ok: true, limit, left });
   }
