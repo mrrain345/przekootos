@@ -7,6 +7,7 @@
       <router-link to="/ranking/year">Year</router-link>
       <router-link to="/ranking/all">All</router-link>
     </div>
+    <Calendar :mode.sync="time"/>
     <div v-for="(user, id) in users" :key="id">
       <RankingItem :id="id+1" :user="user"/>
     </div>
@@ -15,11 +16,13 @@
 
 <script>
 import RankingItem from '@/components/RankingItem.vue';
+import Calendar from '@/components/Calendar.vue';
 
 export default {
   name: 'ranking',
   components: {
     RankingItem,
+    Calendar,
   },
   data: () => ({
     users: [],
@@ -56,7 +59,7 @@ export default {
 
 <style scoped>
 #nav {
-  padding: 30px;
+  padding-bottom: 10px;
   padding-top: 0;
   text-align: center;
 }
