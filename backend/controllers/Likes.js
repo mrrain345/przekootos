@@ -61,7 +61,7 @@ module.exports = class Likes {
     const from = new Date(req.query.from);
     const to = new Date(req.query.to);
 
-    const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : req.params.id;
+    const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : Number.parseInt(req.params.id);
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const users = await this.models.Likes.findAll({
@@ -87,7 +87,7 @@ module.exports = class Likes {
     const from = new Date(req.query.from);
     const to = new Date(req.query.to);
 
-    const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : req.params.id;
+    const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : Number.parseInt(req.params.id);
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const likes = await this.models.Likes.findOne({

@@ -8,6 +8,8 @@
       <router-link to="/ranking/all">All</router-link>
     </div>
     <Calendar :mode.sync="time" v-model="date" @input="updateRanking()"/>
+    <Chart :users.sync="users" :step.sync="time"/>
+
     <div v-for="(user, id) in users" :key="id">
       <RankingItem :id="id+1" :user="user"/>
     </div>
@@ -17,12 +19,14 @@
 <script>
 import RankingItem from '@/components/RankingItem.vue';
 import Calendar from '@/components/Calendar.vue';
+import Chart from '@/components/Chart.vue';
 
 export default {
   name: 'ranking',
   components: {
     RankingItem,
     Calendar,
+    Chart,
   },
   data: () => ({
     users: [],
