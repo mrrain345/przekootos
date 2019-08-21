@@ -4,9 +4,11 @@ const HTTPStatus = require('http-status');
 const { Op } = Sequelize;
 
 function Timestamp(from, to) {
-  if (!isNaN(from) && !isNaN(to)) return { [Op.between]: [from, to] };
-  if (!isNaN(from)) return { [Op.gte]: from };
-  if (!isNaN(to)) return { [Op.lte]: to };
+  const check = date => !Number.isNaN(date.getTime());
+
+  if (check(from) && check(to)) return { [Op.between]: [from, to] };
+  if (check(from)) return { [Op.gte]: from };
+  if (check(to)) return { [Op.lte]: to };
   return { [Op.not]: null };
 }
 
@@ -103,7 +105,7 @@ module.exports = class Likes {
   async get_like(req, res) {
     if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     if (req.params.id === 'me') return res.json({ like: false });
-    
+
     const date = new Date();
     const from = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
@@ -122,7 +124,7 @@ module.exports = class Likes {
     if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const { like } = req.body;
     if (like !== true && like !== false) return res.sendStatus(HTTPStatus.NOT_FOUND);
-    
+
     const date = new Date();
     const from = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 

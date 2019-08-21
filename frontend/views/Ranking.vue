@@ -31,13 +31,13 @@ export default {
   }),
   methods: {
     updateRanking() {
-      const from = this.date.from ? `from=${this.date.from.toISOString()}` : '';
-      const to = this.date.to ? `to=${this.date.to.toISOString()}` : '';
+      const from = this.date.from ? `from=${this.date.from.toJSON()}` : '';
+      const to = this.date.to ? `to=${this.date.to.toJSON()}` : '';
       let query = (from || to) ? '?' : '';
       if (from) query += from;
       if (from && to) query += '&';
       if (to) query += to;
-      
+
       fetch(`/api/users/all/likes${query}`)
         .then(res => res.json())
         .then((res) => {
