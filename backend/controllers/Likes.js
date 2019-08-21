@@ -3,34 +3,32 @@ const HTTPStatus = require('http-status');
 
 const { Op } = Sequelize;
 
+function Timestamp(from, to) {
+  if (!isNaN(from) && !isNaN(to)) return { [Op.between]: [from, to] };
+  if (!isNaN(from)) return { [Op.gte]: from };
+  if (!isNaN(to)) return { [Op.lte]: to };
+  return { [Op.not]: null };
+}
+
 module.exports = class Likes {
   routes() {
-    this.get('/users/all/likes/:time?', this.get_all_likes);
-    this.get('/users/:id/likes/:time?', this.get_likes);
-    this.get('/users/:id/likes/:time/count', this.get_likes_count);
+    this.get('/users/all/likes', this.get_all_likes);
+    this.get('/users/:id/likes/', this.get_likes);
+    this.get('/users/:id/likes/count', this.get_likes_count);
     this.get('/users/:id/like', this.get_like);
     this.put('/users/:id/like', this.put_like);
     this.get('/likes_limit', this.likes_limit_r);
   }
 
-  async get_timestamp(time) {
-    return this.sequelize.query(`SELECT DATE_TRUNC('${time}', CURRENT_TIMESTAMP)::timestamptz AS time`, { type: Sequelize.QueryTypes.SELECT })
-      .then(res => res[0].time)
-      .catch(err => console.log(err));
-  }
-
-  // Get all likes (time: day/week/month/year/all, default: all)
+  // Get all likes
   async get_all_likes(req, res) {
-    const time = (!req.params.time) ? 'all' : req.params.time;
-    if (!['day', 'week', 'month', 'year', 'all'].includes(time)) return res.sendStatus(HTTPStatus.NOT_FOUND);
-    const timestamp = (time !== 'all')
-      ? { [Op.gte]: await this.get_timestamp(time) }
-      : { [Op.not]: null };
+    const from = new Date(req.query.from);
+    const to = new Date(req.query.to);
 
     const users = [];
     await this.models.Likes.findAll({
       attributes: ['target', [Sequelize.fn('count', '*'), 'count']],
-      where: { timestamp },
+      where: { timestamp: Timestamp(from, to) },
       group: ['target'],
       order: [[Sequelize.literal('"count"'), 'DESC']],
     })
@@ -56,19 +54,17 @@ module.exports = class Likes {
     return res.json({ users });
   }
 
-  // Get list of user likes (time: day/week/month/year/all, default: all)
+  // Get list of user likes
   async get_likes(req, res) {
-    const time = (!req.params.time) ? 'all' : req.params.time;
-    if (!['day', 'week', 'month', 'year', 'all'].includes(time)) return res.sendStatus(HTTPStatus.NOT_FOUND);
+    const from = new Date(req.query.from);
+    const to = new Date(req.query.to);
+
     const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : req.params.id;
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
-    const timestamp = (time !== 'all')
-      ? { [Op.gte]: await this.get_timestamp(time) }
-      : { [Op.not]: null };
 
     const users = await this.models.Likes.findAll({
       attributes: ['user'],
-      where: { target, timestamp },
+      where: { target, timestamp: Timestamp(from, to) },
     })
       .then((likes) => {
         const ids = [];
@@ -84,18 +80,17 @@ module.exports = class Likes {
     return res.json({ likes: users, count: users.length });
   }
 
-  // Get count of user likes (time: day/week/month/year/all)
+  // Get count of user likes
   async get_likes_count(req, res) {
-    if (!['day', 'week', 'month', 'year', 'all'].includes(req.params.time)) return res.sendStatus(HTTPStatus.NOT_FOUND);
+    const from = new Date(req.query.from);
+    const to = new Date(req.query.to);
+
     const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : req.params.id;
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
-    const timestamp = (req.params.time !== 'all')
-      ? { [Op.gte]: await this.get_timestamp(req.params.time) }
-      : { [Op.not]: null };
 
     const likes = await this.models.Likes.findOne({
       attributes: ['target', [Sequelize.fn('count', '*'), 'count']],
-      where: { target, timestamp },
+      where: { target, timestamp: Timestamp(from, to) },
       group: ['target'],
     })
       .catch(err => console.log(err));
@@ -108,13 +103,15 @@ module.exports = class Likes {
   async get_like(req, res) {
     if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     if (req.params.id === 'me') return res.json({ like: false });
-    const timestamp = { [Op.gte]: await this.get_timestamp('day') };
+    
+    const date = new Date();
+    const from = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     const user = await this.helper.get_userid(req);
     if (!user) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const like = await this.models.Likes.findOne({
-      where: { timestamp, user, target: req.params.id },
+      where: { timestamp: { [Op.gte]: from }, user, target: req.params.id },
     }).catch(err => console.log(err));
 
     return res.json({ like: (like !== null) });
@@ -125,7 +122,9 @@ module.exports = class Likes {
     if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const { like } = req.body;
     if (like !== true && like !== false) return res.sendStatus(HTTPStatus.NOT_FOUND);
-    const timestamp = { [Op.gte]: await this.get_timestamp('day') };
+    
+    const date = new Date();
+    const from = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     const user = await this.helper.get_userid(req);
     if (!user) return res.sendStatus(HTTPStatus.NOT_FOUND);
@@ -135,7 +134,7 @@ module.exports = class Likes {
     if (req.params.id === user) return res.json({ like: false, limit, left });
 
     const liked = await this.models.Likes.findOne({
-      where: { timestamp, user, target: req.params.id },
+      where: { timestamp: { [Op.gte]: from }, user, target: req.params.id },
     }).catch(err => console.log(err));
 
     if (!like === !liked) return res.json({ like, limit, left });
@@ -158,11 +157,12 @@ module.exports = class Likes {
   }
 
   async likes_limit(id) {
-    const timestamp = { [Op.gte]: await this.get_timestamp('day') };
+    const date = new Date();
+    const from = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     const likes = await this.models.Likes.findOne({
       attributes: ['user', [Sequelize.fn('count', '*'), 'count']],
-      where: { user: id, timestamp },
+      where: { user: id, timestamp: { [Op.gte]: from } },
       group: ['user'],
     }).catch(err => console.log(err));
 

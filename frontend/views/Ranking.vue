@@ -7,7 +7,7 @@
       <router-link to="/ranking/year">Year</router-link>
       <router-link to="/ranking/all">All</router-link>
     </div>
-    <Calendar :mode.sync="time"/>
+    <Calendar :mode.sync="time" v-model="date" @input="updateRanking()"/>
     <div v-for="(user, id) in users" :key="id">
       <RankingItem :id="id+1" :user="user"/>
     </div>
@@ -27,31 +27,31 @@ export default {
   data: () => ({
     users: [],
     time: 'day',
+    date: { from: null, to: null },
   }),
   methods: {
-    updateRanking(time) {
-      this.time = (!time) ? 'day' : time;
-      if (!['day', 'week', 'month', 'year', 'all'].includes(time)) {
-        this.$router.replace('/ranking');
-        return;
-      }
-
-      fetch(`/api/users/all/likes/${this.time}`)
+    updateRanking() {
+      const from = this.date.from ? `from=${this.date.from.toISOString()}` : '';
+      const to = this.date.to ? `to=${this.date.to.toISOString()}` : '';
+      let query = (from || to) ? '?' : '';
+      if (from) query += from;
+      if (from && to) query += '&';
+      if (to) query += to;
+      
+      fetch(`/api/users/all/likes${query}`)
         .then(res => res.json())
         .then((res) => {
           this.users = res.users;
         });
     },
   },
-  created() {
-    this.updateRanking(this.$route.params.time);
-  },
   beforeRouteUpdate(to, from, next) {
     if (!['day', 'week', 'month', 'year', 'all'].includes(to.params.time)) {
-      return next('/ranking');
+      this.time = 'day';
+      return next('/ranking/day');
     }
 
-    this.updateRanking(to.params.time);
+    this.time = to.params.time;
     return next();
   },
 };

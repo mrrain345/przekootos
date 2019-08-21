@@ -35,7 +35,7 @@
           {{getYear()}}
         </button>
         <div class="dropdown-menu scrollable-menu" aria-labelledby="years">
-          <button class="dropdown-item" v-for="i in 10" :key="i" :class="{ 'active' : i === year }" @click="change('year', i)">{{getYear()}}</button>
+          <button class="dropdown-item" v-for="i in 10" :key="i" :class="{ 'active' : i === year }" @click="change('year', i)">{{getYear(i)}}</button>
         </div>
       </div>
     </div>
@@ -44,7 +44,7 @@
 <script>
 export default {
   name: 'Calendar',
-  props: ['mode'],
+  props: ['mode', 'value'],
   data: () => ({
     day: 1,
     week: {},
@@ -91,6 +91,7 @@ export default {
       }
 
       this.weeks = weeks;
+      this.week = weeks[0];
     },
     printWeek(week) {
       const { start, end, id } = week;
@@ -99,8 +100,9 @@ export default {
       if (id === this.weeks.length-1 && end < 28) return `${start} - <span class="gray">${end}</span>`;
       return `${start} - ${end}`;
     },
-    getYear() {
-      return this.thisYear - 10 + this.year;
+    getYear(i) {
+      const year = i ? i : this.year;
+      return this.thisYear - 10 + year;
     },
     change(t, i) {
       if (t === 'day') this.day = i;
@@ -110,9 +112,51 @@ export default {
 
       if (t === 'month' || t === 'year') {
         this.refreshWeeks();
-        this.week = this.weeks[0];
       }
+
+      this.updateTime();
     },
+    updateTime() {
+      let time;
+
+      if (this.mode === 'day') {
+        const from = new Date(this.getYear(), this.month-1, this.day);
+        const to = new Date(this.getYear(), this.month-1, this.day, 23, 59, 59);
+        time = {from, to};
+      }
+
+      if (this.mode === 'week') {
+        const from = new Date(this.getYear(), this.month-1, this.week.start);
+        const to = new Date(this.getYear(), this.month-1, this.week.end, 23, 59, 59);
+        time = {from, to};
+      }
+
+      if (this.mode === 'month') {
+        const from = new Date(this.getYear(), this.month-1, 1);
+        const to = new Date(this.getYear(), this.month-1, this.getDays(), 23, 59, 59);
+        time = {from, to};
+      }
+
+      if (this.mode === 'year') {
+        const from = new Date(this.getYear(), 0, 1);
+        const to = new Date(this.getYear(), 11, 31, 23, 59, 59);
+        time = {from, to};
+      }
+
+      if (this.mode === 'all') {
+        const from = null;
+        const to = null;
+        time = {from, to};
+      }
+
+      this.$emit('input', time);
+      return time;
+    },
+  },
+  watch: {
+    mode() {
+      this.updateTime();
+    }
   },
   mounted() {
     const date = new Date();
@@ -122,12 +166,9 @@ export default {
     this.thisYear = date.getFullYear();
     this.refreshWeeks();
     this.week = this.weeks.find(w => w.end >= this.day);
+
+    this.updateTime();
   },
-  /* TODO: 
-   * calendar
-   * google chars
-   * backend: db services
-   */
 }
 </script>
 
