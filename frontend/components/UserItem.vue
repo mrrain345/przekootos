@@ -9,16 +9,25 @@
         :class="{ active: active }" @click="click"
       />
     </div>
+    <div id="center" v-if="display(user)">
+      <LikeMessage :id="user.id" :display.sync="active"/>
+    </div>
     <div style="clear:both;"></div>
   </div>
 </template>
 
 <script>
+import LikeMessage from '@/components/LikeMessage.vue';
+
 export default {
   name: 'UserItem',
+  components: {
+    LikeMessage,
+  },
   props: ['user', 'me'],
   data: () => ({
     active: false,
+    msgDisplay: false,
     loaded: false,
   }),
   methods: {
@@ -74,12 +83,44 @@ export default {
 
 #left {
   float: left;
+  max-width: 75%;
+}
+
+#center {
+  clear: both;
+  height: 75px;
+  margin-right: 20px;
 }
 
 #right {
   float: right;
   width: 75px;
   height: 75px;
+  max-width: 25%;
+}
+
+#email {
+  color: #BBDEFB;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 768px) {
+  #center {
+    clear: none;
+    float: right;
+    width: 35%;
+    height: 75px;
+    margin-right: 20px;
+  }
+
+  #left {
+    max-width: 50%;
+  }
+
+  #email {
+    margin-bottom: 0;
+  }
 }
 
 #przekootos {
@@ -111,11 +152,6 @@ export default {
   font-size: 32px;
   letter-spacing: 2px;
   color: #E3F2FD;
-}
-
-#email {
-  color: #BBDEFB;
-  font-size: 18px;
 }
 
 #like {
