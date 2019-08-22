@@ -12,14 +12,13 @@ function Timestamp(from, to) {
   return { [Op.not]: null };
 }
 
-function getFromDate(step, count) {
-  const date = new Date();
+function getFromDate(to, step, count) {
   const from = new Date();
   from.setHours(0, 0, 0, 0);
-  if (step === 'day') from.setDate(date.getDate() - count + 1);
-  else if (step === 'week') from.setDate(date.getDate() - 7 * count + 1);
-  else if (step === 'month') from.setMonth(date.getMonth() - count + 1);
-  else if (step === 'year') from.setYear(date.getYear() - count + 1);
+  if (step === 'day') from.setDate(to.getDate() - count + 1);
+  else if (step === 'week') from.setDate(to.getDate() - 7 * count + 1);
+  else if (step === 'month') from.setMonth(to.getMonth() - count + 1, 1);
+  else if (step === 'year') from.setFullYear(to.getFullYear() - count + 1, 0, 1);
   else return null;
   return from;
 }
@@ -35,7 +34,7 @@ module.exports = class Chart {
     const step = req.query.step || 'day'; // day/week/month/year
     const stepsCount = req.query.count || 12;
     const to = req.query.to ? new Date(req.query.to) : new Date();
-    const from = req.query.from ? new Date(req.query.from) : getFromDate(step, stepsCount);
+    const from = req.query.from ? new Date(req.query.from) : getFromDate(to, step, stepsCount);
     if (!from) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const users = [];
@@ -73,7 +72,7 @@ module.exports = class Chart {
     }
 
     return res.json({
-      step, stepsCount, from: from.toJSON(), to: to.toJSON(), charts,
+      step, count: stepsCount, from: from.toJSON(), to: to.toJSON(), charts,
     });
   }
 
@@ -82,7 +81,7 @@ module.exports = class Chart {
     const step = req.query.step || 'day'; // day/week/month/year
     const count = req.query.count || 12;
     const to = req.query.to ? new Date(req.query.to) : new Date();
-    const from = req.query.from ? new Date(req.query.from) : getFromDate(step, count);
+    const from = req.query.from ? new Date(req.query.from) : getFromDate(to, step, count);
     if (!from) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const target = (req.params.id === 'me')
@@ -104,7 +103,7 @@ module.exports = class Chart {
       if (step === 'day') next = date.setDate(date.getDate() + 1);
       if (step === 'week') next = date.setDate(date.getDate() + 7);
       if (step === 'month') next = date.setMonth(date.getMonth() + 1);
-      if (step === 'year') next = date.setYear(date.getYear() + 1);
+      if (step === 'year') next = date.setFullYear(date.getFullYear() + 1);
       if (next >= max) return new Date(max);
       return new Date(next);
     };

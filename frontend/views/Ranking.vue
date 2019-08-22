@@ -8,7 +8,7 @@
       <router-link to="/ranking/all">All</router-link>
     </div>
     <Calendar :mode.sync="time" v-model="date" @input="updateRanking()"/>
-    <Chart :users.sync="users" :step.sync="time"/>
+    <Chart :users.sync="users" :step.sync="time" :date.sync="date"/>
 
     <div v-for="(user, id) in users" :key="id">
       <RankingItem :id="id+1" :user="user"/>
