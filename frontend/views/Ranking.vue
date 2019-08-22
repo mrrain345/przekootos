@@ -49,6 +49,12 @@ export default {
         });
     },
   },
+  created() {
+    this.time = this.$route.params.time;
+    if (!['day', 'week', 'month', 'year', 'all'].includes(this.time)) {
+      this.$router.replace('/ranking/day');
+    }
+  },
   beforeRouteUpdate(to, from, next) {
     if (!['day', 'week', 'month', 'year', 'all'].includes(to.params.time)) {
       this.time = 'day';

@@ -14,13 +14,16 @@ export default new Router({
       component: Home,
     },
     {
-      path: '/ranking/:time',
+      path: '/ranking/:time?',
       name: 'ranking',
       component: () => import(/* webpackChunkName: "ranking" */ './views/Ranking.vue'),
-    },
-    {
-      path: '/ranking',
-      redirect: '/ranking/day',
+      beforeEnter: (to, from, next) => {
+        if (!to.params.time) return next('/ranking/day');
+        if (['day', 'week', 'month', 'year', 'all'].includes(to.params.time)) {
+          return next();
+        }
+        return next(`/not-found?u=${encodeURIComponent(to.path)}`);
+      },
     },
     {
       path: '/register',
@@ -43,9 +46,16 @@ export default new Router({
       component: () => import(/* webpackChunkName: "logout" */ './views/Logout.vue'),
     },
     {
-      path: '*',
+      path: '/not-found',
       name: 'not-found',
       component: () => import(/* webpackChunkName: "not-found" */ './views/NotFound.vue'),
+    },
+    {
+      path: '*',
+      component: () => import(/* webpackChunkName: "not-found" */ './views/NotFound.vue'),
+      beforeEnter: (to, from, next) => {
+        next(`/not-found?u=${encodeURIComponent(to.path)}`);
+      },
     },
   ],
 });
