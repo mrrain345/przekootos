@@ -12,7 +12,7 @@ export default {
     count: 12,
   }),
   mounted() {
-    google.charts.load('current', {'packages':['line']});
+    google.charts.load('current', { packages: ['line'] });
     google.charts.setOnLoadCallback(this.drawChart);
   },
   methods: {
@@ -20,39 +20,28 @@ export default {
       const chart = new google.visualization.DataTable();
       chart.addColumn('date', '');
 
-      const usersData = [];
+      const users = await fetch(`/api/users/all/chart?count=${this.count}&step=${this.step}`)
+        .then(res => res.json())
+        .then(res => res.charts)
+        .catch(err => console.log(err));
 
-      for (let i = 0; i < this.users.length; i++) {
-        const user = this.users[i];
-        const data = await fetch(`/api/users/${user.id}/chart?count=${this.count}&step=${this.step}`)
-          .then(res => res.json())
-          .catch(err => console.log(err));
+      console.log(users);
+      if (users.length === 0) return;
 
-        const userData = [];
-        data.data.forEach(row => {
-          userData.push([new Date(row.from), row.count]);
-        });
-        usersData.push({ id: user.id, username: user.username, data: data.data });
-      };
-
-      if (usersData.length === 0) return;
-
-      for (let i = 0; i < usersData.length; i+=1) {
-        chart.addColumn('number', usersData[i].username);
+      for (let i = 0; i < users.length; i += 1) {
+        chart.addColumn('number', users[i].username);
       }
 
-      for (let j = 0; j < this.count; j+=1) {
-        const row = [new Date(usersData[0].data[j].from)];
-        for (let i = 0; i < usersData.length; i+=1) {
-          row.push(usersData[i].data[j].count);
+      for (let j = 0; j < this.count; j += 1) {
+        const row = [new Date(users[0].data[j].from)];
+        for (let i = 0; i < users.length; i += 1) {
+          console.log(`[${i}, ${j}]`, users[i].data[j]);
+          row.push(users[i].data[j].count);
         }
         chart.addRows([row]);
       }
 
       const options = {
-        /*chart: {
-          title: 'Daily kootoses',
-        },*/
         height: 250,
       };
 
@@ -61,7 +50,7 @@ export default {
     },
   },
   watch: {
-    step() { this.drawChart() },
-  }
-}
+    step() { this.drawChart(); },
+  },
+};
 </script>

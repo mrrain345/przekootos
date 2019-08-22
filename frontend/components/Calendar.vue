@@ -6,16 +6,20 @@
           {{day}}
         </button>
         <div class="dropdown-menu scrollable-menu" aria-labelledby="days">
-          <button class="dropdown-item" v-for="i in getDays()" :key="i" :class="{ 'active' : i === day }" @click="change('day', i)">{{i}}</button>
+          <button class="dropdown-item" v-for="i in getDays()" :key="i"
+            :class="{ 'active' : i === day }" @click="change('day', i)">{{i}}
+          </button>
         </div>
       </div>
 
       <div class="btn-group" role="group" v-if="mode==='week'">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="weeks"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-html="printWeek(week)">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+          id="weeks" aria-haspopup="true" aria-expanded="false" v-html="printWeek(week)">
         </button>
         <div class="dropdown-menu scrollable-menu" aria-labelledby="weeks">
-          <button class="dropdown-item" v-for="(w, i) in weeks" :key="i" :class="{ 'active' : i === week.id }" @click="change('week', w)" v-html="printWeek(w)"></button>
+          <button class="dropdown-item" v-for="(w, i) in weeks" :key="i"
+            :class="{ 'active' : i === week.id }" @click="change('week', w)" v-html="printWeek(w)">
+          </button>
         </div>
       </div>
 
@@ -25,7 +29,9 @@
           {{months[month]}}
         </button>
         <div class="dropdown-menu scrollable-menu" aria-labelledby="months">
-          <button class="dropdown-item" v-for="i in 12" :key="i" :class="{ 'active' : i === month }" @click="change('month', i)">{{months[i]}}</button>
+          <button class="dropdown-item" v-for="i in 12" :key="i"
+            :class="{ 'active' : i === month }" @click="change('month', i)">{{months[i]}}
+          </button>
         </div>
       </div>
 
@@ -35,7 +41,9 @@
           {{getYear()}}
         </button>
         <div class="dropdown-menu scrollable-menu" aria-labelledby="years">
-          <button class="dropdown-item" v-for="i in 10" :key="i" :class="{ 'active' : i === year }" @click="change('year', i)">{{getYear(i)}}</button>
+          <button class="dropdown-item" v-for="i in 10" :key="i" :class="{ 'active' : i === year }"
+            @click="change('year', i)">{{getYear(i)}}
+          </button>
         </div>
       </div>
     </div>
@@ -54,26 +62,26 @@ export default {
     weeks: [],
     months: [
       'null',
-      'January',  'February', 'March',
-      'April',    'May',      'June',
-      'July',     'August',   'September',
-      'October',  'November', 'December',
+      'January', 'February', 'March',
+      'April', 'May', 'June',
+      'July', 'August', 'September',
+      'October', 'November', 'December',
     ],
   }),
   methods: {
     getDays(month) {
-      const m = (month) ? month : this.month;
+      const m = month || this.month;
       const year = this.getYear();
       const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-      const isLeap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+      const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
       if (isLeap && m === 2) return 29;
-      return days[m-1];
+      return days[m - 1];
     },
     refreshWeeks() {
       const weeks = [];
-      const date = new Date(this.getYear(), this.month-1, 1);
+      const date = new Date(this.getYear(), this.month - 1, 1);
 
-      const lastmonth = (this.month > 1) ? this.month-1 : 12;
+      const lastmonth = (this.month > 1) ? this.month - 1 : 12;
       const day = (date.getDay() === 0) ? 7 : date.getDay();
       const start = (day === 1) ? 1 : this.getDays(lastmonth) - day + 2;
       const end = 8 - day;
@@ -81,23 +89,23 @@ export default {
 
       const days = this.getDays();
       let id = 1;
-      for (let i = end+1; i < days; i+=7) {
-        weeks.push({ start: i, end: i+6, id});
+      for (let i = end + 1; i < days; i += 7) {
+        weeks.push({ start: i, end: i + 6, id });
         id += 1;
       }
 
-      if (weeks[weeks.length-1].end > days) {
-        weeks[weeks.length-1].end -= days;
+      if (weeks[weeks.length - 1].end > days) {
+        weeks[weeks.length - 1].end -= days;
       }
 
       this.weeks = weeks;
-      this.week = weeks[0];
+      [this.week] = weeks;
     },
     printWeek(week) {
       const { start, end, id } = week;
 
       if (id === 0 && start > 1) return `<span class="gray">${start}</span> - ${end}`;
-      if (id === this.weeks.length-1 && end < 28) return `${start} - <span class="gray">${end}</span>`;
+      if (id === this.weeks.length - 1 && end < 28) return `${start} - <span class="gray">${end}</span>`;
       return `${start} - ${end}`;
     },
     getYear(i) {
