@@ -37,7 +37,7 @@ module.exports = class Chart {
     const from = req.query.from ? new Date(req.query.from) : getFromDate(to, step, stepsCount);
     if (!from) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
-    const users = [];
+    const usersData = [];
     await this.models.Likes.findAll({
       attributes: ['target', [Sequelize.fn('count', '*'), 'count']],
       where: { timestamp: { [Op.between]: [from, to] } },
@@ -54,7 +54,10 @@ module.exports = class Chart {
             .then((usr) => {
               const user = usr.dataValues;
               user.likes = parseInt(count, 10);
-              users.push(user);
+              return this.getChart(user, from, to, step);
+            })
+            .then((chart) => {
+              usersData.push(chart);
             })
             .catch(err => console.log(err));
           promises.push(promise);
@@ -62,14 +65,12 @@ module.exports = class Chart {
         return Promise.all(promises);
       }).catch(err => console.log(err));
 
-    users.sort((a, b) => b.likes - a.likes);
-
-    const charts = [];
-    for (let i = 0; i < users.length; i += 1) {
-      const user = users[i];
-      const chart = await this.getChart(users[i].id, from, to, step);
-      charts.push({ id: user.id, username: user.username, data: chart.data });
-    }
+    usersData.sort((a, b) => b.user.likes - a.user.likes);
+    const charts = usersData.map(x => ({
+      id: x.user.id,
+      username: x.user.username,
+      data: x.data,
+    }));
 
     return res.json({
       step, count: stepsCount, from: from.toJSON(), to: to.toJSON(), charts,
@@ -88,14 +89,14 @@ module.exports = class Chart {
       ? await this.helper.get_userid(req)
       : Number.parseInt(req.params.id, 10);
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
-    const chart = await this.getChart(target, from, to, step);
+    const chart = await this.getChart({ id: target }, from, to, step);
 
     return res.json({
       target, step, count, from: from.toJSON(), to: to.toJSON(), data: chart.data,
     });
   }
 
-  async getChart(target, from, to, step) {
+  async getChart(user, from, to, step) {
     const nextDate = (prev, max) => {
       if (prev >= max) return null;
       const date = new Date(prev);
@@ -109,7 +110,7 @@ module.exports = class Chart {
     };
 
     const data = await this.models.Likes.findAll({
-      where: { target, timestamp: Timestamp(from, to) },
+      where: { target: user.id, timestamp: Timestamp(from, to) },
       order: [['timestamp', 'ASC']],
     })
       .then((likes) => {
@@ -136,6 +137,6 @@ module.exports = class Chart {
       })
       .catch(err => console.log(err));
 
-    return { target, data };
+    return { user, data };
   }
 };
