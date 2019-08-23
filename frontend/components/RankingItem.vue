@@ -92,8 +92,14 @@ export default {
   height: 0;
   overflow: hidden;
   color: #FFFFFF;
+  letter-spacing: 0.5px;
   transition: all 0.3s;
   transition-timing-function: ease-out;
+}
+
+.more strong {
+  color: #E3F2FD;
+  letter-spacing: 1px;
 }
 
 #name {
