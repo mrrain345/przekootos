@@ -58,7 +58,8 @@ module.exports = class Likes {
 
   // Get list of user likes
   async get_likes(req, res) {
-    const from = new Date(req.query.from);
+    const from = (req.query.from) ? new Date(req.query.from) : new Date();
+    if (!req.query.from) from.setHours(0, 0, 0, 0);
     const to = new Date(req.query.to);
 
     const target = (req.params.id === 'me')
@@ -67,19 +68,30 @@ module.exports = class Likes {
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const users = await this.models.Likes.findAll({
-      attributes: ['user'],
+      attributes: ['user', 'message'],
       where: { target, timestamp: Timestamp(from, to) },
     })
       .then((likes) => {
-        const ids = [];
-        likes.forEach(like => ids.push(like.user));
-        return this.models.Users.findAll({
-          attributes: { exclude: ['password'] },
-          where: { id: ids },
-          order: [['username', 'ASC']],
-        });
+        const promises = [];
+        for (let i = 0; i < likes.length; i += 1) {
+          const like = likes[i].dataValues;
+          const promise = this.models.Users.findByPk(like.user, {
+            attributes: { exclude: ['password'] },
+            order: [['username', 'ASC']],
+          })
+            .then((user) => {
+              if (!user) return null;
+              const u = user.dataValues;
+              u.message = like.message;
+              return u;
+            });
+          promises.push(promise);
+        }
+        return Promise.all(promises);
       })
       .catch(err => console.log(err));
+
+    users.sort((a, b) => (a.username < b.username ? -1 : a.username > b.username));
 
     return res.json({ likes: users, count: users.length });
   }
