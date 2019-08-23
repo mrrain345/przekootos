@@ -10,7 +10,9 @@
       />
     </div>
     <div id="center" v-if="display(user)">
-      <LikeMessage :id="user.id" :display.sync="active"/>
+      <LikeMessage :id="user.id" :display.sync="msgDisplay"
+        v-model="message" :message.sync="mesg" @ok="vote()" @cancel="cancel()"
+      />
     </div>
     <div style="clear:both;"></div>
   </div>
@@ -24,14 +26,24 @@ export default {
   components: {
     LikeMessage,
   },
-  props: ['user', 'me'],
+  props: ['user', 'me', 'enable'],
   data: () => ({
     active: false,
     msgDisplay: false,
     loaded: false,
+    message: '',
+    mesg: '',
   }),
   methods: {
     click() {
+      if (!this.active && this.enable) this.msgDisplay = !this.msgDisplay;
+      else if (this.active) this.vote();
+    },
+    cancel() {
+      this.msgDisplay = false;
+      this.message = '';
+    },
+    vote() {
       const lastActive = this.active;
       this.active = !this.active;
 
@@ -45,13 +57,17 @@ export default {
         .then(res => res.json())
         .then((res) => {
           this.active = res.like;
-          this.$root.$emit('like', {
+          this.msgDisplay = false;
+          this.mesg = (res.like) ? this.message : '';
+          this.message = '';
+          this.$emit('like', {
             limit: res.limit,
             left: res.left,
           });
         })
         .catch(() => {
           this.active = lastActive;
+          this.message = '';
         });
     },
     display(user) {
@@ -88,7 +104,7 @@ export default {
 
 #center {
   clear: both;
-  height: 75px;
+  max-height: 75px;
   margin-right: 20px;
 }
 
@@ -103,6 +119,8 @@ export default {
   color: #BBDEFB;
   font-size: 18px;
   margin-bottom: 10px;
+  max-height: 27px;
+  overflow: hidden;
 }
 
 @media (min-width: 768px) {
@@ -131,7 +149,7 @@ export default {
   user-select: none;
 }
 
-#przekootos:hover {
+#przekootos:active {
   filter: grayscale(100%) contrast(180%);
 }
 
@@ -139,7 +157,7 @@ export default {
   filter: grayscale(0%) contrast(80%);
 }
 
-#przekootos.active:hover {
+#przekootos.active:active {
   filter: grayscale(0%) contrast(100%);
 }
 
@@ -152,6 +170,8 @@ export default {
   font-size: 32px;
   letter-spacing: 2px;
   color: #E3F2FD;
+  max-height: 96px;
+  overflow: hidden;
 }
 
 #like {

@@ -1,9 +1,11 @@
 <template>
   <div class="container">
     <div v-if="loaded==3">
-      <div v-if="logged"><LikesLimit :limit="limit" :left="left" /></div>
+      <div v-if="logged">
+        <LikesLimit :limit.sync="limit" :left.sync="left"/>
+      </div>
       <div v-for="user in users" :key="user.id">
-        <UserItem :me="me" :user="user"/>
+        <UserItem :me="me" :user="user" :enable.sync="left" @like="like"/>
       </div>
     </div>
   </div>
@@ -27,6 +29,12 @@ export default {
     logged: false,
     loaded: 0,
   }),
+  methods: {
+    like(e) {
+      this.left = e.left;
+      this.limit = e.limit;
+    },
+  },
   created() {
     this.loaded = 0;
 
