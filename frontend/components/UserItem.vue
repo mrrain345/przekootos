@@ -52,13 +52,16 @@ export default {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ like: this.active }),
+        body: JSON.stringify({
+          like: this.active,
+          message: this.message,
+        }),
       })
         .then(res => res.json())
         .then((res) => {
           this.active = res.like;
           this.msgDisplay = false;
-          this.mesg = (res.like) ? this.message : '';
+          this.mesg = res.message;
           this.message = '';
           this.$emit('like', {
             limit: res.limit,
@@ -71,7 +74,7 @@ export default {
         });
     },
     display(user) {
-      return this.loaded && this.me !== null && user.id !== this.me;
+      return this.loaded && this.me && user.id !== this.me;
     },
   },
   beforeMount() {
@@ -81,6 +84,7 @@ export default {
       .then(res => res.json())
       .then((res) => {
         this.active = res.like;
+        this.mesg = res.message;
         this.loaded = true;
       });
   },

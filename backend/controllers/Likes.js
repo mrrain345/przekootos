@@ -61,7 +61,9 @@ module.exports = class Likes {
     const from = new Date(req.query.from);
     const to = new Date(req.query.to);
 
-    const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : Number.parseInt(req.params.id);
+    const target = (req.params.id === 'me')
+      ? await this.helper.get_userid(req)
+      : Number.parseInt(req.params.id, 10);
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const users = await this.models.Likes.findAll({
@@ -87,7 +89,9 @@ module.exports = class Likes {
     const from = new Date(req.query.from);
     const to = new Date(req.query.to);
 
-    const target = (req.params.id === 'me') ? await this.helper.get_userid(req) : Number.parseInt(req.params.id);
+    const target = (req.params.id === 'me')
+      ? await this.helper.get_userid(req)
+      : Number.parseInt(req.params.id, 10);
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const likes = await this.models.Likes.findOne({
@@ -116,13 +120,14 @@ module.exports = class Likes {
       where: { timestamp: { [Op.gte]: from }, user, target: req.params.id },
     }).catch(err => console.log(err));
 
-    return res.json({ like: (like !== null) });
+    if (like) return res.json({ like: true, message: like.dataValues.message });
+    return res.json({ like: false, message: '' });
   }
 
   // Like/Dislike a user
   async put_like(req, res) {
     if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
-    const { like } = req.body;
+    const { like, message } = req.body;
     if (like !== true && like !== false) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const date = new Date();
@@ -143,19 +148,26 @@ module.exports = class Likes {
 
     if (like) {
       if (!left) {
-        return res.json({ like: false, limit, left });
+        return res.json({
+          like: false, message: '', limit, left,
+        });
       }
 
       await this.models.Likes.create({
         user,
         target: req.params.id,
+        message,
       }).catch(err => console.log(err));
-      return res.json({ like: true, limit, left: left - 1 });
+      return res.json({
+        like: true, message, limit, left: left - 1,
+      });
     }
     await this.models.Likes.destroy({
       where: { id: liked.id },
     }).catch(err => console.log(err));
-    return res.json({ like: false, limit, left: left + 1 });
+    return res.json({
+      like: false, message: '', limit, left: left + 1,
+    });
   }
 
   async likes_limit(id) {

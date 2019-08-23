@@ -11,6 +11,7 @@ module.exports.init = (sequelize) => {
     },
     user: { type: Sequelize.INTEGER, allowNull: false, references: { model: Users, key: 'id' } },
     target: { type: Sequelize.INTEGER, allowNull: false, references: { model: Users, key: 'id' } },
+    message: { type: Sequelize.STRING(40), allowNull: true },
     timestamp: { type: Sequelize.DATE, allowNull: false, defaultValue: Sequelize.NOW },
   }, { sequelize, modelName: 'likes', timestamps: false });
 
