@@ -7,7 +7,7 @@
 <script>
 export default {
   name: 'Chart',
-  props: ['users', 'step', 'date'],
+  props: ['step', 'date'],
   data: () => ({
     init: false,
     count: {

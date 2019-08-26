@@ -11,7 +11,7 @@
       <div class="buttons">
         <button class="cancel btn btn-light" @click="buttonClick('cancel')">Cancel</button>
         <button class="ok btn btn-success" @click="buttonClick('ok')">
-          {{modify ? 'Save' : 'Vote'}}
+          Vote
         </button>
       </div>
       <div style="clear: both;"></div>
@@ -23,9 +23,6 @@
 export default {
   name: 'LikeMessage',
   props: ['id', 'display', 'value', 'message'],
-  data: () => ({
-    modify: false,
-  }),
   methods: {
     inputModel(e) {
       this.$emit('input', e.target.value);

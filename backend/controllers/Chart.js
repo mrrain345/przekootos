@@ -13,7 +13,7 @@ function Timestamp(from, to) {
 }
 
 function getFromDate(to, step, count) {
-  const from = new Date();
+  const from = new Date(to);
   from.setHours(0, 0, 0, 0);
   if (step === 'day') from.setDate(to.getDate() - count + 1);
   else if (step === 'week') from.setDate(to.getDate() - 7 * count + 1);

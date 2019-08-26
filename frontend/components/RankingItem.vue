@@ -13,7 +13,7 @@
       <div @DOMSubtreeModified="recalculate">
         <hr/>
         <div v-for="(like, id) in likes" :key="id">
-          <strong>{{like.username}}:</strong> {{like.message}}
+          <strong>{{like.username}}{{like.message ? ':' : ''}}</strong> {{like.message}}
         </div>
       </div>
     </div>
@@ -23,7 +23,7 @@
 <script>
 export default {
   name: 'RankingItem',
-  props: ['user', 'id'],
+  props: ['user', 'id', 'date'],
   data: () => ({
     expanded: false,
     likes: null,
@@ -45,12 +45,23 @@ export default {
       }
     },
     getData() {
-      fetch(`/api/users/${this.user.id}/likes`)
+      let query = (this.date.from || this.date.to) ? '?' : '';
+      if (this.date.from) query += `from=${this.date.from.toJSON()}`;
+      if (this.date.from && this.date.to) query += '&';
+      if (this.date.to) query += `to=${this.date.to.toJSON()}`;
+
+      fetch(`/api/users/${this.user.id}/likes${query}`)
         .then(res => res.json())
         .then((res) => {
           this.user.likes = res.count;
           this.likes = res.likes;
         });
+    },
+  },
+  watch: {
+    date() {
+      this.expanded = false;
+      this.likes = false;
     },
   },
 };

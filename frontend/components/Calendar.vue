@@ -26,11 +26,11 @@
       <div class="btn-group" role="group" v-if="mode!=='year' && mode!=='all'">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="months"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{months[month]}}
+          {{months[month-1]}}
         </button>
         <div class="dropdown-menu scrollable-menu" aria-labelledby="months">
           <button class="dropdown-item" v-for="i in 12" :key="i"
-            :class="{ 'active' : i === month }" @click="change('month', i)">{{months[i]}}
+            :class="{ 'active' : i === month }" @click="change('month', i)">{{months[i-1]}}
           </button>
         </div>
       </div>
@@ -61,7 +61,6 @@ export default {
     thisYear: 2019,
     weeks: [],
     months: [
-      'null',
       'January', 'February', 'March',
       'April', 'May', 'June',
       'July', 'August', 'September',
@@ -109,13 +108,13 @@ export default {
       return `${start} - ${end}`;
     },
     getYear(i) {
-      const year = i ? i : this.year;
+      const year = i || this.year;
       return this.thisYear - 10 + year;
     },
     change(t, i) {
       if (t === 'day') this.day = i;
       if (t === 'week') this.week = i;
-      if (t === 'month') this.month = i; 
+      if (t === 'month') this.month = i;
       if (t === 'year') this.year = i;
 
       if (t === 'month' || t === 'year') {
@@ -128,33 +127,40 @@ export default {
       let time;
 
       if (this.mode === 'day') {
-        const from = new Date(this.getYear(), this.month-1, this.day);
-        const to = new Date(this.getYear(), this.month-1, this.day, 23, 59, 59);
-        time = {from, to};
+        const from = new Date(this.getYear(), this.month - 1, this.day);
+        const to = new Date(this.getYear(), this.month - 1, this.day, 23, 59, 59);
+        time = { from, to };
       }
 
       if (this.mode === 'week') {
-        const from = new Date(this.getYear(), this.month-1, this.week.start);
-        const to = new Date(this.getYear(), this.month-1, this.week.end, 23, 59, 59);
-        time = {from, to};
+        const from = new Date(this.getYear(), this.month - 1, this.week.start);
+        const to = new Date(this.getYear(), this.month - 1, this.week.end, 23, 59, 59);
+        if (this.week.start > this.week.end) {
+          if (this.week.id === 0) {
+            from.setMonth(from.getMonth() - 1);
+          } else {
+            to.setMonth(to.getMonth() + 1);
+          }
+        }
+        time = { from, to };
       }
 
       if (this.mode === 'month') {
-        const from = new Date(this.getYear(), this.month-1, 1);
-        const to = new Date(this.getYear(), this.month-1, this.getDays(), 23, 59, 59);
-        time = {from, to};
+        const from = new Date(this.getYear(), this.month - 1, 1);
+        const to = new Date(this.getYear(), this.month - 1, this.getDays(), 23, 59, 59);
+        time = { from, to };
       }
 
       if (this.mode === 'year') {
         const from = new Date(this.getYear(), 0, 1);
         const to = new Date(this.getYear(), 11, 31, 23, 59, 59);
-        time = {from, to};
+        time = { from, to };
       }
 
       if (this.mode === 'all') {
         const from = null;
         const to = null;
-        time = {from, to};
+        time = { from, to };
       }
 
       this.$emit('input', time);
@@ -164,20 +170,20 @@ export default {
   watch: {
     mode() {
       this.updateTime();
-    }
+    },
   },
   mounted() {
     const date = new Date();
 
     this.day = date.getDate();
-    this.month = date.getMonth()+1;
+    this.month = date.getMonth() + 1;
     this.thisYear = date.getFullYear();
     this.refreshWeeks();
     this.week = this.weeks.find(w => w.end >= this.day);
-
+    if (!this.week) this.week = this.weeks[this.weeks.length - 1];
     this.updateTime();
   },
-}
+};
 </script>
 
 <style>

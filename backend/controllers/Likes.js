@@ -58,8 +58,7 @@ module.exports = class Likes {
 
   // Get list of user likes
   async get_likes(req, res) {
-    const from = (req.query.from) ? new Date(req.query.from) : new Date();
-    if (!req.query.from) from.setHours(0, 0, 0, 0);
+    const from = new Date(req.query.from);
     const to = new Date(req.query.to);
 
     const target = (req.params.id === 'me')
