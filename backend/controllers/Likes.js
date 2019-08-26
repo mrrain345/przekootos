@@ -67,7 +67,7 @@ module.exports = class Likes {
     if (!target) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const users = await this.models.Likes.findAll({
-      attributes: ['user', 'message'],
+      attributes: ['user', 'message', 'timestamp'],
       where: { target, timestamp: Timestamp(from, to) },
     })
       .then((likes) => {
@@ -82,6 +82,7 @@ module.exports = class Likes {
               if (!user) return null;
               const u = user.dataValues;
               u.message = like.message;
+              u.timestamp = like.timestamp;
               return u;
             });
           promises.push(promise);
@@ -90,7 +91,7 @@ module.exports = class Likes {
       })
       .catch(err => console.log(err));
 
-    users.sort((a, b) => (a.username < b.username ? -1 : a.username > b.username));
+    users.sort((a, b) => (a.timestamp > b.timestamp ? -1 : a.timestamp < b.timestamp));
 
     return res.json({ likes: users, count: users.length });
   }
