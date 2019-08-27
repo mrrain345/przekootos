@@ -32,7 +32,6 @@
 <script>
 export default {
   name: 'History',
-  props: ['user'],
   data: () => ({
     likes: null,
     likesShow: 4,

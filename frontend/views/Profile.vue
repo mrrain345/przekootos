@@ -1,13 +1,17 @@
 <template>
   <div>
     <div v-if="loaded">
-      <History :user="user"/>
+      <History/>
+      <div class="margin"></div>
+      <Settings :user="user"/>
+      <div class="margin"></div>
     </div>
   </div>
 </template>
 
 <script>
 import History from '@/components/History.vue';
+import Settings from '@/components/Settings.vue';
 
 export default {
   name: 'profile',
@@ -17,6 +21,7 @@ export default {
   }),
   components: {
     History,
+    Settings,
   },
   beforeCreate() {
     fetch('/api/session')
@@ -31,3 +36,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.margin {
+  margin-top: 30px;
+}
+</style>
