@@ -16,16 +16,12 @@ module.exports.init = (sequelize) => {
     password: {
       type: Sequelize.STRING,
       allowNull: true,
+      defaultValue: null,
     },
     email: {
       type: Sequelize.STRING,
       allowNull: false,
       unique: true,
-    },
-    usertype: {
-      type: Sequelize.STRING(20),
-      allowNull: false,
-      defaultValue: "'NORMAL'",
     },
   }, { sequelize, modelName: 'users' });
 

@@ -38,34 +38,24 @@ module.exports = class GitHub {
 
     const usr = await this.models.Users.findOne({
       attributes: { exclude: ['password'] },
-      where: { email: user.email, usertype: 'GITHUB' },
+      where: { email: user.email },
     })
       .then(async (_usr) => {
         if (!_usr) {
           return this.models.Users.create({
             username: user.username,
-            password: null,
             email: user.email,
-            usertype: 'GITHUB',
           }, {
             returning: ['id'],
           })
             .then(us => us[1][0].dataValues);
         }
 
-        return this.models.Users.update({
-          username: user.username,
-          password: null,
-          email: user.email,
-          usertype: 'GITHUB',
-        }, {
-          where: {
-            email: user.email,
-            usertype: 'GITHUB',
-          },
-          returning: true,
+        return this.models.Users.findOne({
+          attributes: ['id'],
+          where: { email: user.email },
         })
-          .then(us => us[1][0].dataValues);
+          .then(us => us.dataValues);
       })
       .catch(err => console.log(err));
 

@@ -1,5 +1,8 @@
 const hash = require('password-hash');
 const HTTPStatus = require('http-status');
+const Sequelize = require('sequelize');
+
+const { Op } = Sequelize;
 
 module.exports = class Session {
   routes() {
@@ -23,7 +26,10 @@ module.exports = class Session {
     if (!req.body.email || !req.body.password) return res.sendStatus(HTTPStatus.NOT_FOUND);
 
     const user = await this.models.Users.findOne({
-      where: { email: req.body.email },
+      where: {
+        email: req.body.email,
+        password: { [Op.ne]: null },
+      },
     }).catch(err => console.log(err));
 
     if (!user) return res.json({ ok: false });
