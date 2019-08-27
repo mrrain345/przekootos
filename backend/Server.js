@@ -1,7 +1,10 @@
 const express = require('express');
 const cookies = require('cookie-parser');
 const Sequelize = require('sequelize');
+const schedule = require('node-schedule');
 const helper = require('./helper');
+
+const { Op } = Sequelize;
 
 module.exports = class Server {
   constructor(data) {
@@ -30,7 +33,7 @@ module.exports = class Server {
       this.models[model] = data.models[model].init(this.sequelize);
     });
 
-    this.helper = helper(cookies, this.sequelize, this.models);
+    this.helper = helper(cookies, this.sequelize, this.config, this.models);
 
     // set controllers default fields
     for (let i = 0; i < this.controllers.length; i += 1) {
@@ -78,6 +81,16 @@ module.exports = class Server {
   run() {
     this.express.listen(this.config.port, () => {
       console.log(`listening on ${this.config.port}`);
+    });
+
+    // remove old sessions every day at 3am
+    schedule.scheduleJob({ hour: 3, minute: 0 }, () => {
+      const timestamp = new Date(new Date() - this.config.sessionTime);
+      this.models.Sessions.destroy({
+        where: {
+          updatedAt: { [Op.lt]: timestamp },
+        },
+      });
     });
   }
 };

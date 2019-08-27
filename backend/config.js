@@ -1,6 +1,7 @@
 module.exports = {
   port: 3000,
   cookieSecret: 'as7aVtnSDxa20LfOXDBzdEII4cSVezdp',
+  sessionTime: 1000 * 60 * 60 * 24 * 30, // 30 days
   likes_limit: 3,
   db: {
     engine: 'postgres',

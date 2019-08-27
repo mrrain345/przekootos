@@ -69,7 +69,7 @@ module.exports = class GitHub {
       })
       .catch(err => console.log(err));
 
-    await this.helper.create_github_session(res, usr.id, access_token);
+    await this.create_session(res, usr.id, access_token);
     return res.json(user);
   }
 
@@ -91,5 +91,18 @@ module.exports = class GitHub {
       : emails.find(e => e.primary).email;
 
     return { username: user.name, email };
+  }
+
+  async create_session(res, id, token) {
+    await this.models.Sessions.create({
+      user: id,
+      session: `github:${token}`,
+    }).catch(err => console.log(err));
+
+    res.cookie('session', `github:${token}`, {
+      maxAge: 1000 * 60 * 60 * 30, // session for 30 days
+      httpOnly: true,
+      signed: true,
+    });
   }
 };

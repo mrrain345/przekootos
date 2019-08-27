@@ -12,6 +12,7 @@ module.exports = class Session {
   async get_session(req, res) {
     const user = await this.helper.get_user(req);
     if (user === null) return res.json({ ok: false });
+    await this.helper.refresh_session(req, res);
     return res.json({ ok: true, user });
   }
 
