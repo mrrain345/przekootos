@@ -1,0 +1,106 @@
+<template>
+  <div class="container panel">
+    <div class="header">History</div>
+    <div class="expand" v-if="likes && likes.length > likesShow" @click="click">
+      <i class="material-icons">{{expanded ? 'expand_less' : 'expand_more'}}</i>
+    </div>
+    <div style="clear: both;"></div>
+    <div class="history-table" @DOMSubtreeModified="recalculate">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col">Time</th>
+            <th scope="col">Username</th>
+            <th scope="col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(like, id) in likes"
+            :key="id">
+            <td>{{new Date(like.timestamp).toLocaleDateString()}}</td>
+            <td>{{like.username}}</td>
+            <td>{{like.message}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'History',
+  props: ['user'],
+  data: () => ({
+    likes: null,
+    likesShow: 4,
+    expanded: false,
+  }),
+  methods: {
+    click() {
+      this.expanded = !this.expanded;
+      this.recalculate();
+    },
+    recalculate() {
+      const table = document.querySelector('.history-table');
+      const rows = document.querySelectorAll('table tr');
+      const show = (this.likesShow < this.likes.length) ? this.likesShow : this.likes.length;
+      const count = this.expanded ? this.likes.length : show;
+      if (rows.lenth === 1) table.style.height = `${rows[0].clientHeight}px`;
+      else table.style.height = `${rows[0].clientHeight + rows[1].clientHeight * count}px`;
+    },
+  },
+  created() {
+    fetch('/api/users/me/likes')
+      .then(res => res.json())
+      .then((res) => {
+        this.likes = res.likes;
+      });
+  },
+};
+</script>
+
+<style scoped>
+.panel {
+  padding: 0;
+}
+
+.header {
+  padding: 20px;
+  font-weight: bold;
+  font-size: 24px;
+  float: left
+}
+
+.expand {
+  float: right;
+  user-select: none;
+  margin: 16px;
+  width: 40px;
+  height: 40px;
+}
+
+.material-icons {
+  font-size: 40px;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+.material-icons:active {
+  color: #BBDEFB;
+}
+
+.history-table {
+  transition: all 0.3s;
+  transition-timing-function: ease-out;
+  overflow: hidden;
+}
+
+.table {
+  color: #E3F2FD;
+}
+
+th {
+  letter-spacing: 1px;
+}
+</style>

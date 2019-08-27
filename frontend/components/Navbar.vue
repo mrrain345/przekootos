@@ -4,6 +4,7 @@
       <router-link to="/ranking">Ranking</router-link>
       <router-link to="/login" v-if="!logged">Login</router-link>
       <router-link to="/register" v-if="!logged">Register</router-link>
+      <router-link to="/profile" v-if="logged">Profile</router-link>
       <router-link to="/logout" v-if="logged">Logout</router-link>
   </div>
 </template>
