@@ -2,7 +2,7 @@
   <div class="container">
     <div v-if="loaded==3">
       <div v-if="logged">
-        <LikesLimit :limit.sync="limit" :left.sync="left"/>
+        <LikesLimit :limit.sync="limit" :left.sync="left" :username="me.username"/>
       </div>
       <div v-for="user in users" :key="user.id">
         <UserItem :me="me" :user="user" :enable.sync="left" @like="like"/>
@@ -41,7 +41,7 @@ export default {
     fetch('/api/session')
       .then(res => res.json())
       .then((res) => {
-        if (res.ok) this.me = res.user.id;
+        if (res.ok) this.me = res.user;
         else this.me = null;
         this.loaded += 1;
       });

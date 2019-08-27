@@ -1,8 +1,8 @@
 <template>
-  <div id="panel">
+  <div class="panel">
     <div id="left">
-      <div id="name">{{user.username}}</div>
-      <div id="email">{{user.email}}</div>
+      <div class="username">{{user.username}}</div>
+      <div class="email">{{user.email}}</div>
     </div>
     <div id="right" v-if="display(user)">
       <img id="przekootos" class="noselect" src="/przekootos.png"
@@ -74,7 +74,7 @@ export default {
         });
     },
     display(user) {
-      return this.loaded && this.me && user.id !== this.me;
+      return this.loaded && this.me && user.id !== this.me.id;
     },
   },
   beforeMount() {
@@ -92,13 +92,9 @@ export default {
 </script>
 
 <style scoped>
-#panel {
-  background-color: #2196F3;
+.panel {
   margin: 20px 0;
-  padding: 20px 20px;
   padding-left: 30px;
-  border-radius: 5px;
-  box-shadow: #0277bd 2px 2px 4px 1px;
 }
 
 #left {
@@ -119,12 +115,8 @@ export default {
   max-width: 25%;
 }
 
-#email {
-  color: #BBDEFB;
-  font-size: 18px;
+.email {
   margin-bottom: 10px;
-  max-height: 27px;
-  overflow: hidden;
 }
 
 @media (min-width: 768px) {
@@ -140,7 +132,7 @@ export default {
     max-width: 50%;
   }
 
-  #email {
+  .email {
     margin-bottom: 0;
   }
 }
@@ -167,15 +159,6 @@ export default {
 
 #panel:first-child {
   margin-top: 0;
-}
-
-#name {
-  font-weight: bold;
-  font-size: 32px;
-  letter-spacing: 2px;
-  color: #E3F2FD;
-  max-height: 96px;
-  overflow: hidden;
 }
 
 #like {

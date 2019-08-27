@@ -35,7 +35,7 @@ module.exports = (cookies, sequelize, config, models) => ({
     }).catch(err => console.log(err));
     if (!user) return null;
 
-    return { id: user.id, userdata: user };
+    return user.dataValues;
   },
 
   create_session: async (res, id) => {
@@ -57,10 +57,7 @@ module.exports = (cookies, sequelize, config, models) => ({
       signed: true,
     });
 
-    return {
-      id: user.id,
-      userdata: user,
-    };
+    return user;
   },
   refresh_session: async (req, res) => {
     const { session } = req.signedCookies;

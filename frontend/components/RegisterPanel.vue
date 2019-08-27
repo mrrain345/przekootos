@@ -1,5 +1,5 @@
 <template>
-  <div id="form" class="col-10 col-sm-8 col-md-5 col-lg-4">
+  <div class="panel col-10 col-sm-8 col-md-5 col-lg-4">
     <form onsubmit="return false;">
       <div class="row">
         <div class="form-group col-6">
@@ -119,17 +119,14 @@ export default {
 </script>
 
 <style scoped>
-#form {
-  background-color: #2196f3;
-  border-radius: 5px;
+.panel {
   padding: 40px 20px;
-  box-shadow: #0277bd 2px 2px 4px 1px;
 }
 
 label {
-  color: #263238;
   margin-bottom: 2px;
   letter-spacing: 0.5px;
+  font-weight: bold;
 }
 
 small {

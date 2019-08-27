@@ -1,8 +1,8 @@
 <template>
-  <div id="panel">
+  <div class="panel">
     <div id="left">
-      <div id="name">{{id}}. {{user.username}}</div>
-      <div id="email">{{user.email}}</div>
+      <div class="username">{{id}}. {{user.username}}</div>
+      <div class="email">{{user.email}}</div>
       <div id="likes">Votes: {{user.likes}}</div>
     </div>
     <div id="right" @click="click">
@@ -13,7 +13,10 @@
       <div @DOMSubtreeModified="recalculate">
         <hr/>
         <div v-for="(like, id) in likes" :key="id">
-          <strong>{{like.username}}{{like.message ? ':' : ''}}</strong> {{like.message}}
+          <strong data-toggle="tooltip" :title="like.email">
+            {{like.username}}{{like.message ? ':' : ''}}
+          </strong>
+          {{like.message}}
         </div>
       </div>
     </div>
@@ -68,13 +71,9 @@ export default {
 </script>
 
 <style scoped>
-#panel {
-  background-color: #2196F3;
+.panel {
   margin: 20px 0;
-  padding: 20px 20px;
   padding-left: 30px;
-  border-radius: 5px;
-  box-shadow: #0277bd 2px 2px 4px 1px;
 }
 
 #left {
@@ -111,18 +110,6 @@ export default {
 .more strong {
   color: #E3F2FD;
   letter-spacing: 1px;
-}
-
-#name {
-  font-weight: bold;
-  font-size: 32px;
-  letter-spacing: 2px;
-  color: #E3F2FD;
-}
-
-#email {
-  color: #BBDEFB;
-  font-size: 18px;
 }
 
 #likes {

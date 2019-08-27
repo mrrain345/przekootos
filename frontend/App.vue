@@ -15,3 +15,28 @@ export default {
   },
 };
 </script>
+
+<style>
+.panel {
+  background-color: #2196F3;
+  padding: 20px 20px;
+  border-radius: 5px;
+  box-shadow: inset #0277bd -1px -1px 4px 0;
+  color: #E3F2FD;
+}
+
+.username {
+  font-weight: bold;
+  font-size: 32px;
+  letter-spacing: 2px;
+  max-height: 96px;
+  overflow: hidden;
+}
+
+.email {
+  color: #BBDEFB;
+  font-size: 18px;
+  max-height: 27px;
+  overflow: hidden;
+}
+</style>
