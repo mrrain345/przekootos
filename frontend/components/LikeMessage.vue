@@ -1,20 +1,24 @@
 <template>
   <div>
     <div class="messagebox" :class="{ 'active': display }">
-      <input type="text" class="form-control" placeholder="Description"
-         :value="value" @input="inputModel" maxlength="40"
-      />
-      <div class="message" :class="{ 'active': !display }">
-        {{message}}
-      </div>
-      <div style="clear: both;"></div>
-      <div class="buttons">
-        <button class="cancel btn btn-light" @click="buttonClick('cancel')">Cancel</button>
-        <button class="ok btn btn-success" @click="buttonClick('ok')">
-          Vote
-        </button>
-      </div>
-      <div style="clear: both;"></div>
+      <form onsubmit="return false;">
+        <input type="text" class="form-control" placeholder="Description"
+          :value="value" @input="inputModel" maxlength="40"
+        />
+        <div class="message" :class="{ 'active': !display }">
+          {{message}}
+        </div>
+        <div style="clear: both;"></div>
+        <div class="buttons">
+          <button type="button" class="cancel btn btn-light" @click="buttonClick('cancel')">
+            Cancel
+          </button>
+          <button type="submit" class="ok btn btn-success" @click="buttonClick('ok')">
+            Vote
+          </button>
+        </div>
+        <div style="clear: both;"></div>
+      </form>
     </div>
   </div>
 </template>

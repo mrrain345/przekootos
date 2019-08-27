@@ -48,7 +48,7 @@
           <GitHub/>
         </div>
         <div class="col-6">
-          <button type="button" class="create-btn btn btn-success d-none d-xl-block"
+          <button type="submit" class="create-btn btn btn-success d-none d-xl-block"
             @click="create">Create Account
           </button>
           <button type="submit" class="create-btn btn btn-success d-xl-none" @click="create">

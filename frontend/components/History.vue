@@ -9,17 +9,19 @@
       <table class="table table-striped table-sm">
         <thead>
           <tr>
-            <th scope="col">Time</th>
+            <th scope="col" class="td-left">Time</th>
             <th scope="col">Username</th>
-            <th scope="col">Description</th>
+            <th scope="col" class="td-right">Description</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(like, id) in likes"
             :key="id">
-            <td>{{new Date(like.timestamp).toLocaleDateString()}}</td>
-            <td>{{like.username}}</td>
-            <td>{{like.message}}</td>
+            <td class="td-left">{{printDate(like.timestamp)}}</td>
+            <td class="td-middle">
+              <span data-toggle="tooltip" :title="like.email">{{like.username}}</span>
+            </td>
+            <td class="td-right">{{like.message}}</td>
           </tr>
         </tbody>
       </table>
@@ -40,6 +42,16 @@ export default {
     click() {
       this.expanded = !this.expanded;
       this.recalculate();
+    },
+    printDate(date) {
+      const fixed = v => ((v.toString().length === 1) ? `0${v}` : v);
+      const d = new Date(date);
+      const day = fixed(d.getDate());
+      const month = fixed(d.getMonth() + 1);
+      const year = d.getFullYear();
+      const hour = fixed(d.getHours());
+      const min = fixed(d.getMinutes());
+      return `${day}.${month}.${year} ${hour}:${min}`;
     },
     recalculate() {
       const table = document.querySelector('.history-table');
@@ -102,5 +114,18 @@ export default {
 
 th {
   letter-spacing: 1px;
+}
+
+.td-left {
+  padding-left: 20px;
+}
+
+.td-middle {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.td-right {
+  padding-right: 20px;
 }
 </style>
