@@ -78,9 +78,13 @@ module.exports = class Server {
     });
   }
 
-  run() {
+  async run() {
+    // check database connection
+    await this.sequelize.authenticate();
+
+    // run express server
     this.express.listen(this.config.port, () => {
-      console.log(`listening on ${this.config.port}`);
+      console.log(`Listening on ${this.config.port}`);
     });
 
     // remove old sessions every day at 3am
