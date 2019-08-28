@@ -80,7 +80,8 @@ export default {
   padding: 20px;
   font-weight: bold;
   font-size: 24px;
-  float: left
+  float: left;
+  letter-spacing: 1.5px;
 }
 
 .expand {

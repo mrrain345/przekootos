@@ -3,7 +3,7 @@
     <div v-if="loaded">
       <History/>
       <div class="margin"></div>
-      <Settings :user="user"/>
+      <Settings :user.sync="user"/>
       <div class="margin"></div>
     </div>
   </div>

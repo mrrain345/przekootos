@@ -11,8 +11,8 @@ export default {
   name: 'GitHub',
   data: () => ({
     client_id: '6f85928125d9b221f454',
-  })
-}
+  }),
+};
 </script>
 
 <style scoped>

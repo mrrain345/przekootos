@@ -57,8 +57,8 @@ module.exports = class Server {
         router.put(path, method.bind(controller));
       };
 
-      controller.path = (path, method) => {
-        router.path(path, method.bind(controller));
+      controller.patch = (path, method) => {
+        router.patch(path, method.bind(controller));
       };
 
       controller.delete = (path, method) => {
