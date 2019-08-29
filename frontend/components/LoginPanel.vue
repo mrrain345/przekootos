@@ -48,9 +48,7 @@ export default {
     login() {
       fetch('/api/session', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: this.email,
           password: this.password,
@@ -58,10 +56,12 @@ export default {
       })
         .then(res => res.json())
         .then((res) => {
-          this.alert = !res.ok;
+          this.alert = !res.ok && res.code === 1;
           if (res.ok) {
             this.$root.$emit('login', true);
             this.$router.push({ path: '/' });
+          } else if (res.code === 2) {
+            this.$router.push({ path: '/login/activate' });
           }
         });
     },

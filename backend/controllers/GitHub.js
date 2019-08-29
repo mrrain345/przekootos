@@ -48,7 +48,10 @@ module.exports = class GitHub {
           }, {
             returning: ['id'],
           })
-            .then(us => us[1][0].dataValues);
+            .then((us) => {
+              console.log(us);
+              return us.dataValues;
+            });
         }
 
         return this.models.Users.findOne({

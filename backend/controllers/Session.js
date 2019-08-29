@@ -32,8 +32,13 @@ module.exports = class Session {
       },
     }).catch(err => console.log(err));
 
-    if (!user) return res.json({ ok: false });
-    if (!hash.verify(req.body.password, user.password)) return res.json({ ok: false });
+    if (!user) return res.json({ ok: false, code: 1, message: 'User does not exist' });
+    if (!hash.verify(req.body.password, user.password)) {
+      return res.json({ ok: false, code: 1, message: 'User does not exist' });
+    }
+    if (user.registration_code !== null) {
+      return res.json({ ok: false, code: 2, message: 'User is not verified' });
+    }
 
     const usr = await this.helper.create_session(res, user.id);
 

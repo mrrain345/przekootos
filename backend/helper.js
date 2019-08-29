@@ -1,4 +1,5 @@
 const cryptoRandom = require('crypto-random-string');
+const nodemailer = require('nodemailer');
 
 module.exports = (cookies, sequelize, config, models) => ({
   cookies,
@@ -44,6 +45,8 @@ module.exports = (cookies, sequelize, config, models) => ({
     }).catch(err => console.log(err));
 
     if (!user) return null;
+    if (user.registration_code) return false;
+
     const session = `normal:${cryptoRandom({ length: 32 })}`;
 
     await models.Sessions.create({
@@ -70,6 +73,19 @@ module.exports = (cookies, sequelize, config, models) => ({
       maxAge: config.sessionTime,
       httpOnly: true,
       signed: true,
+    });
+  },
+  send_email: (address, subject, content) => {
+    const transporter = nodemailer.createTransport(config.nodemailer);
+    const mail = {
+      from: config.mail_address,
+      to: address,
+      subject,
+      html: content,
+    };
+
+    transporter.sendMail(mail, (err) => {
+      if (err) console.log(err);
     });
   },
 });

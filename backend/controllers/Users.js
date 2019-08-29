@@ -1,6 +1,7 @@
 const validator = require('validator');
 const hash = require('password-hash');
 const HTTPStatus = require('http-status');
+const randomString = require('crypto-random-string');
 
 module.exports = class Users {
   routes() {
@@ -9,6 +10,7 @@ module.exports = class Users {
     this.post('/users', this.post_user);
     this.get('/users/:id/password', this.has_password);
     this.patch('/users/:id', this.patch_user);
+    this.post('/users/:id/registration_code', this.post_registration_code);
   }
 
   // get all users
@@ -69,19 +71,31 @@ module.exports = class Users {
     }
 
     const ok = errors.length === 0;
-    let usr;
-
     if (ok) {
+      const registration_code = randomString({ length: 32, type: 'hex' });
+
       const user = await this.models.Users.create({
         username: `${req.body.fname} ${req.body.lname}`,
         password: hash.generate(req.body.password),
         email: req.body.email,
+        registration_code,
       }).catch(err => console.log(err));
 
-      usr = await this.helper.create_session(res, user.id);
+      const mail = `
+<h1>Przekootos</h1>
+<hr/>
+<p>
+  <strong>Your account was created!</strong><br/>
+  Click button below to activate your account.
+</p>
+<a href="${this.config.url}/login/activate?code=${user.id}.${registration_code}">
+  <button>Activate account!</button>
+</a>
+`;
+      this.helper.send_email(req.body.email, 'Przekootos: Activate your account', mail);
     }
 
-    res.json({ ok, errors, user: usr });
+    res.json({ ok, errors });
   }
 
   async has_password(req, res) {
@@ -152,5 +166,24 @@ module.exports = class Users {
       .catch(err => console.log(err));
 
     return res.json({ ok: true, user });
+  }
+
+  async post_registration_code(req, res) {
+    const { registration_code } = req.body;
+    if (!registration_code) res.sendStatus(HTTPStatus.BAD_REQUEST);
+    const { id } = req.params;
+
+    const ok = await this.models.Users.update(
+      { registration_code: null },
+      { where: { id, registration_code } },
+    )
+      .then(result => result[0] !== 0)
+      .catch(err => console.log(err));
+
+    if (!ok) return res.json({ ok: false });
+
+    const user = await this.helper.create_session(res, id);
+
+    return res.json({ ok, user });
   }
 };

@@ -23,6 +23,10 @@ module.exports.init = (sequelize) => {
       allowNull: false,
       unique: true,
     },
+    registration_code: {
+      type: Sequelize.STRING(32),
+      allowNull: true,
+    },
   }, { sequelize, modelName: 'users' });
 
   return Users;

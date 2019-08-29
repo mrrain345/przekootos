@@ -88,16 +88,13 @@ export default {
     create() {
       fetch('/api/users', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.form),
       })
         .then(res => res.json())
         .then((res) => {
           if (res.ok) {
-            this.$root.$emit('login', true);
-            this.$router.push({ path: '/' });
+            this.$router.push({ path: '/login/activate' });
           } else this.setAlerts(res);
         });
     },
