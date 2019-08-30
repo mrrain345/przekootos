@@ -5,6 +5,8 @@
       <div class="margin"></div>
       <Settings :user.sync="user"/>
       <div class="margin"></div>
+      <TwoFactor/>
+      <div class="margin"></div>
     </div>
   </div>
 </template>
@@ -12,6 +14,7 @@
 <script>
 import History from '@/components/History.vue';
 import Settings from '@/components/Settings.vue';
+import TwoFactor from '@/components/TwoFactor.vue';
 
 export default {
   name: 'profile',
@@ -22,6 +25,7 @@ export default {
   components: {
     History,
     Settings,
+    TwoFactor,
   },
   beforeCreate() {
     fetch('/api/session')
