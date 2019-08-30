@@ -31,6 +31,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "profile" */ './views/Profile.vue'),
     },
     {
+      path: '/profile/authentication',
+      name: 'authentication',
+      component: () => import(/* webpackChunkName: "authentication" */ './views/Authentication.vue'),
+    },
+    {
       path: '/register',
       name: 'register',
       component: () => import(/* webpackChunkName: "register" */ './views/Register.vue'),
@@ -49,11 +54,6 @@ export default new Router({
       path: '/login/activate',
       name: 'login-activate',
       component: () => import(/* webpackChunkName: "login-activate" */ './views/LoginActivate.vue'),
-    },
-    {
-      path: '/login/authentication',
-      name: 'authentication',
-      component: () => import(/* webpackChunkName: "authentication" */ './views/Authentication.vue'),
     },
     {
       path: '/logout',

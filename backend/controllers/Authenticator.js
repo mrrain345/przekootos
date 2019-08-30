@@ -58,7 +58,7 @@ module.exports = class Authenticator {
 
     if (secret === undefined) return res.json({ ok: false, code: 2, message: 'Database error' });
     if (secret === null) return res.json({ ok: false, code: 3, message: 'Two-Factor Authentication is disabled' });
-    if (!authenticator.check(token, secret)) return res.json({ ok: false, code: 1, message: 'Token is incorrect' });
+    if (!authenticator.check(token, secret)) return res.json({ ok: false, code: 1, message: 'Bad authentication code' });
     return res.json({ ok: true });
   }
 };
