@@ -1,8 +1,4 @@
 const hash = require('password-hash');
-const HTTPStatus = require('http-status');
-const Sequelize = require('sequelize');
-
-const { Op } = Sequelize;
 
 module.exports = class Session {
   routes() {
@@ -21,15 +17,14 @@ module.exports = class Session {
 
   // create new session
   async post_session(req, res) {
-    // { email, password }
+    // { email, password, token? }
 
-    if (!req.body.email || !req.body.password) return res.sendStatus(HTTPStatus.NOT_FOUND);
+    if (!req.body.email || !req.body.password) {
+      return res.json({ ok: false, code: 1, message: 'User does not exist' });
+    }
 
     const user = await this.models.Users.findOne({
-      where: {
-        email: req.body.email,
-        password: { [Op.ne]: null },
-      },
+      where: { email: req.body.email },
     }).catch(err => console.log(err));
 
     if (!user) return res.json({ ok: false, code: 1, message: 'User does not exist' });
@@ -40,12 +35,13 @@ module.exports = class Session {
       return res.json({ ok: false, code: 2, message: 'User is not verified' });
     }
 
-    const usr = await this.helper.create_session(res, user.id);
+    if (user.auth_2fa !== null && !req.body.token) {
+      return res.json({ ok: false, code: 3, message: '2fa token is undefined' });
+    }
 
-    return res.json({
-      ok: true,
-      user: usr,
-    });
+    const usr = await this.helper.create_session(res, user.id, req.body.token);
+    if (!usr.error) return res.json({ ok: true, user: usr });
+    return res.json({ ok: false, code: usr.error.code + 1, message: usr.error.message });
   }
 
   // delete your session

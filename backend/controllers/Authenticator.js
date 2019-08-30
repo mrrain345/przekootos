@@ -3,6 +3,10 @@ const crypto = require('crypto');
 const authenticator = require('otplib/authenticator');
 
 module.exports = class Authenticator {
+  init() {
+    authenticator.options = { crypto };
+  }
+
   routes() {
     this.get('/session/2fa', this.is_enabled);
     this.put('/session/2fa', this.set_2fa);
@@ -21,8 +25,6 @@ module.exports = class Authenticator {
     if (!id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     if (enable !== true && enable !== false) return res.sendStatus(HTTPStatus.BAD_REQUEST);
     if (enable && (!secret || !token)) return res.sendStatus(HTTPStatus.BAD_REQUEST);
-
-    authenticator.options = { crypto };
 
     if (enable && !authenticator.check(token, secret)) {
       return res.json({ ok: false, message: 'Bad token' });
