@@ -16,7 +16,7 @@ module.exports = class Users {
   // get all users
   async get_users(req, res) {
     const users = await this.models.Users.findAll({
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ['password', 'auth_2fa'] },
       order: [['username', 'ASC']],
     }).catch(err => console.log(err));
 
@@ -27,7 +27,7 @@ module.exports = class Users {
   async get_user(req, res) {
     if (!req.params.id) return res.sendStatus(HTTPStatus.NOT_FOUND);
     const user = await this.models.Users.findByPk(req.params.id, {
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ['password', 'auth_2fa'] },
     }).catch(err => console.log(err));
     return res.json(user);
   }

@@ -49,7 +49,7 @@ module.exports = class Chart {
         for (let i = 0; i < likes.length; i += 1) {
           const { target, count } = likes[i].dataValues;
           const promise = this.models.Users.findByPk(target, {
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password', 'auth_2fa'] },
           })
             .then((usr) => {
               const user = usr.dataValues;

@@ -27,6 +27,10 @@ module.exports.init = (sequelize) => {
       type: Sequelize.STRING(32),
       allowNull: true,
     },
+    auth_2fa: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
   }, { sequelize, modelName: 'users' });
 
   return Users;

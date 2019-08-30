@@ -31,7 +31,7 @@ module.exports = (cookies, sequelize, config, models) => ({
     if (!sess) return null;
 
     const user = await models.Users.findOne({
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ['password', 'auth_2fa'] },
       where: { id: sess.user },
     }).catch(err => console.log(err));
     if (!user) return null;
@@ -41,7 +41,7 @@ module.exports = (cookies, sequelize, config, models) => ({
 
   create_session: async (res, id) => {
     const user = await models.Users.findByPk(id, {
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ['password', 'auth_2fa'] },
     }).catch(err => console.log(err));
 
     if (!user) return null;

@@ -37,7 +37,7 @@ module.exports = class GitHub {
     const user = await this.get_userdata(access_token);
 
     const usr = await this.models.Users.findOne({
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ['password', 'auth_2fa'] },
       where: { email: user.email },
     })
       .then(async (_usr) => {

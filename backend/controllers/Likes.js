@@ -39,7 +39,7 @@ module.exports = class Likes {
         for (let i = 0; i < likes.length; i += 1) {
           const { target, count } = likes[i].dataValues;
           const promise = this.models.Users.findByPk(target, {
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password', 'auth_2fa'] },
           })
             .then((usr) => {
               const user = usr.dataValues;
@@ -75,7 +75,7 @@ module.exports = class Likes {
         for (let i = 0; i < likes.length; i += 1) {
           const like = likes[i].dataValues;
           const promise = this.models.Users.findByPk(like.user, {
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password', 'auth_2fa'] },
             order: [['username', 'ASC']],
           })
             .then((user) => {
